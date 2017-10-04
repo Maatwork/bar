@@ -15,6 +15,10 @@ pool.query('SELECT * FROM users', function (err, res) {
     pool.end;
 });
 var index = require('./routes/index');
+var register = require('./routes/register');
+var authorize = require('./routes/authorize');
+var clients = require('./routes/clients');
+var clientRoute = require('./routes/client');
 var userModel = require('./models/user');
 var app = express();
 app.oauth = new OAuthServer({
@@ -22,7 +26,7 @@ app.oauth = new OAuthServer({
 });
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -31,9 +35,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(lessMiddleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(app.oauth.authorize());
 app.use('/', index);
+app.use('/register', register);
+app.use('/clients', clients);
+app.use('/client', clientRoute);
 //app.use('/users', users);
+app.get("/oauth/authorize", authorize);
+app.post("/oauth/authorize", app.oauth.authorize());
+app.post("/oauth/token", app.oauth.token());
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');

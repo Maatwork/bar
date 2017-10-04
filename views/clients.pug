@@ -1,0 +1,37 @@
+extends layout
+
+block content
+    .main.container
+        .row
+            .col-md-6.col-md-offset-3
+                h1.display-4.m-b-2 #{title}
+                if msg
+                    .alert.alert-danger #{msg}
+
+            table.table.table-inline
+              - if (typeof(clients) !== 'undefined'){
+                thead
+                    tr
+                        th Client ID
+                        th Client Secret
+                        th Redirect URL
+                    tbody
+                        each client in clients
+                         tr
+                          td #{client.id}
+                          td #{client.client_secret}
+                          td #{client.redirect_url}
+                        else
+                             tr
+                                 td None
+                        - }
+            form.form-inline(method='POST' action='/client')
+                .form-group
+                    label(for='clientId') Client ID:
+                    input#clientId.form-control(type='text', name='clientId')
+                .form-group
+                    label(for='redirectUrl') Redirect URL:
+                    input#redirectUrl.form-control(type='url', name='redirectURL')
+                .form-group
+                    button.btn.btn-primary(type='submit') Add Client
+
