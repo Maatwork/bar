@@ -7,12 +7,21 @@ phases:
       - npm update
   build:
     commands:
-      - echo Build started on `date`
+      - echo Build started
       - echo Compiling the Node.js code
-      - npm build
+      - npm install
   post_build:
     commands:
-      - echo Build completed on `date`
+      - echo Build completed
 artifacts:
   files:
     - appspec.yml
+    - bin/*
+    - models/*
+    - node-modules/*
+    - public/*
+    - routes/*
+    - views/*
+    - package.json
+    - tsconfig.json
+    - app.ts
