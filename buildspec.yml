@@ -5,15 +5,21 @@ phases:
     commands:
       - echo Installing dependencies...
       - npm update
+      - npm install -g typescript
   build:
     commands:
       - echo Build started
       - echo Compiling the Node.js code
       - npm install
+      - tsc
+      - Compiled Typescript code
   post_build:
     commands:
       - echo Build completed
       - chmod -R +x bin/*.sh
+      - echo Cleaning old typescript files
+      - rm -r *.ts
+      - echo Finished!
 artifacts:
   files:
     - appspec.yml

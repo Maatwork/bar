@@ -1,1 +1,1 @@
-npm start www
+node www
