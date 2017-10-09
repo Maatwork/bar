@@ -1,1 +1,2 @@
-npm stop
+cd /var/www/platform
+npm stop > stop.log

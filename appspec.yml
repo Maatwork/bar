@@ -17,16 +17,16 @@ permissions:
 
 hooks:
 ApplicationStop:
-   - location: /var/www/platform/bin/stop.sh
+   - location: bin/stop.sh
      timeout: 10
      runas: ec2-user
 
 AfterInstall:
-   - location: /var/www/platform/bin/install-dependencies.sh
+   - location: bin/install-dependencies.sh
      timeout: 1200
      runas: ec2-user
 
 ApplicationStart:
-   - location: /var/www/platform/bin/start.sh
+   - location: bin/start.sh
      timeout: 60
      runas: ec2-user
