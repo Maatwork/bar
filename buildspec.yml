@@ -30,5 +30,4 @@ artifacts:
     - routes/*
     - views/*
     - package.json
-    - tsconfig.json
-    - app.ts
+    - app.js
