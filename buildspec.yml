@@ -12,7 +12,7 @@ phases:
       - echo Compiling the Node.js code
       - npm install
       - tsc || true
-      - Compiled Typescript code
+      - echo Compiled Typescript code
   post_build:
     commands:
       - echo Build completed
