@@ -12,6 +12,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
+    "express-oauth-server": "^2.0.0",
     "express-session": "^1.15.6",
     "less-middleware": "~2.2.1",
     "morgan": "~1.9.0",
