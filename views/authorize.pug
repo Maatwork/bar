@@ -5,14 +5,14 @@ block content
         .row
             .col-md-6.col-md-offset-3
                 h1.display-4.m-b-2 #{title}
-                if msg
-                    .alert.alert-danger #{msg}
-                form(method='POST' action='/register')
+                    .alert.alert-info <strong>#{client.id}</strong> is requesting access to your Bar Profile with the following scopes: #{scope}
+                form(method='POST')
                     div.form-group
-                        label(for='username') Username:
-                        input#username.form-control(type='username', name='username')
+                        input#client_id.form-control(type='hidden', name='client_id', value=client.id)
+                        input#state.form-control(type='hidden', name='state', value=state)
+                        input#redirectUri.form-control(type='hidden', name='redirectUri', value=redirectUri)
                     div.form-group
-                        label(for='pw') Password:
-                        input#pw.form-control(type='password' name='password')
                     div.form-group
-                    button.btn.btn-primary(type='submit') Sign up
+                    button#allow.btn.btn-success(type='submit', formaction="/authorize?allowed=true", name='allowed', value='true', autofocus='') Allow
+                    br
+                    button#deny.btn.btn-danger(type='submit', formaction="/authorize?allowed=false", name='allowed', value='false', autofocus='') Deny

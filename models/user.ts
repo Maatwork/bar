@@ -3,34 +3,40 @@ const { Pool } = require('pg');
 const pool = new Pool();
 const client = require('../models/client');
 
+var bcrypt = require('bcryptjs');
 
 module.exports.getAccessToken = function(bearerToken, callback) {
-    const sql = 'SELECT access_token, access_token_expires_on, client_id, user_id FROM oauth_tokens WHERE access_token = $1';
+    const sql = 'SELECT access_token, access_token_expires_on, client_id, user_id, scope FROM tokens WHERE access_token = $1';
     pool.query(sql, [bearerToken], (err, result) => {
         if (err) {
             console.log(err);
-            callback(err, null)
+            callback(err, '')
         } else {
-            const token = result.rows[0] //select the first. #lazy
-            callback(err, {
-                accessToken: token.access_token,
-                client: { id: token.client_id },
-                accessTokenExpiresAt: result.access_token_expires_on,
-                user: {id: token.user_id }
-            })
+            const token = result.rows[0]; //select the first. #lazy
+            if (token) {
+                callback(err, {
+                    accessToken: token.access_token,
+                    client: {id: token.client_id},
+                    accessTokenExpiresAt: new Date(token.access_token_expires_on + "+0000"),
+                    user: {id: token.user_id},
+                    scope: token.scope
+                })
+            } else {
+                callback(err, '')
+            }
         }
     })
 };
 
 module.exports.getRefreshToken = function (bearerToken, callback) {
-    const sql = 'SELECT client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE refresh_token = $1';
+    const sql = 'SELECT client_id, refresh_token, refresh_token_expires_on, user_id FROM tokens WHERE refresh_token = $1';
 
      pool.query(sql, [bearerToken], (err, result) => {
         if (err) {
             console.log(err);
             callback(err, null)
         } else {
-            const token = result.rows[0] //select the first. #lazy
+            const token = result.rows[0]; //select the first. #lazy
             callback(err, {
                 refreshToken: token.refresh_token,
                 refreshTokenExpiresAt: token.refresh_token_expires_on,
@@ -41,31 +47,81 @@ module.exports.getRefreshToken = function (bearerToken, callback) {
     })
 };
 
+module.exports.verifyScope = (token, scope) => {
+    console.log("Verifying scope with token scope " + token.scope + " and general scope " + scope);
+    if (!token.scope) {
+        return false;
+    }
+    const authorizedScopes = token.scope.split(' ');
+    return scope.split(' ').every(scope => authorizedScopes.indexOf(scope) != -1)
+};
+
+module.exports.validateScope = (user, client, scope) => {
+    console.log("Validating scope with client scope " + client.scope + " and general scope " + scope);
+    if (!scope.split(' ').every(s => client.scope.indexOf(s) != -1)) return false;
+    return scope;
+};
+
 module.exports.getClient = client.getClient;
 
-module.exports.getUser = function (username, password, callback) {
-    const sql = 'SELECT * FROM users WHERE username = $1 AND password = $2';
-    console.log('getting user!');
-    pool.query(sql, [username, password], (err, result) => {
+module.exports.getUserByUsername = function (username, callback) {
+    const sql = 'SELECT * FROM users WHERE username = $1';
+    pool.query(sql, [username], (err, result) => {
         if (err) {
             console.log(err);
-            callback(err, null);
+            callback(err, '');
         } else {
-            callback(err, result.rows[0]) //select the first. #lazy
+            callback('', result.rows[0])
         }
     })
 };
 
-module.exports.saveUser = function (username, password, res) {
-    const sql = 'INSERT INTO users(id, username, password) VALUES(uuid_generate_v4(), $1, $2) returning id, username, password';
-    console.log('saving user!');
-    pool.query(sql, [username, password], (err, _) => {
+module.exports.getUserById = function (id, callback) {
+    const sql = 'SELECT * FROM users WHERE id = $1';
+    pool.query(sql, [id], (err, result) => {
         if (err) {
             console.log(err);
-            res.render('register', {title: 'Register', msg: err, username: username, password: password})
+            callback(err, '');
         } else {
-            console.log('success!');
-            res.render('index', {title: 'Success'})
+            callback('', result.rows[0])
+        }
+    })
+};
+
+module.exports.getUser = function (username, password, callback) {
+    const sql = 'SELECT * FROM users WHERE username = $1';
+    pool.query(sql, [username], (err, result) => {
+        if (err) {
+            console.log(err);
+            callback(err, '');
+        } else {
+            bcrypt.compare(password, result.rows[0].password, (err, res) =>
+            {
+                if (res) {
+                    callback(err, result.rows[0]) //select the first. #lazy
+                } else {
+                    callback(err, '');
+                }
+            })
+        }
+    })
+};
+
+module.exports.saveUser = function (username, password, res, callback) {
+    bcrypt.genSalt(14, (err, salt) => {
+        if (err) {
+            console.log(err);
+            callback(err, username, res)
+        } else {
+        bcrypt.hash(password, salt, (err, hash) => {
+            if (err) {
+                console.log(err);
+                callback(err, username, res)
+            } else {
+                const sql = 'INSERT INTO users(id, username, password) VALUES(uuid_generate_v4(), $1, $2) returning id, username, password';
+                pool.query(sql, [username, hash], (err, _) => callback(err, username, res));
+            }
+        });
         }
     });
 };
@@ -78,8 +134,29 @@ module.exports.saveAuthorizationCode = function (code, client, user, callback) {
             console.log(err);
             callback(err, null);
         } else {
-            console.log(result.rows[0]);
             callback(err, result.rows[0])
+        }
+    })
+};
+
+module.exports.saveToken = function (token, client, user, callback) {
+    const sql = 'INSERT INTO tokens(id, access_token, access_token_expires_on, refresh_token, refresh_token_expires_on, scope, client_id, user_id) VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, $6, $7) returning access_token, access_token_expires_on, refresh_token, refresh_token_expires_on, scope, client_id, user_id';
+
+    pool.query(sql, [token.accessToken, token.accessTokenExpiresAt, token.refreshToken, token.refreshTokenExpiresAt, token.scope, client.id, user.id], (err, result) => {
+        if (err) {
+            console.log(err);
+            callback(err, null);
+        } else {
+            let token = result.rows[0];
+            callback(err, {
+                accessToken: token.access_token,
+                accessTokenExpiresAt: token.access_token_expires_on,
+                refreshToken: token.refresh_token,
+                refreshTokenExpiresAt: token.refresh_token_expires_on,
+                scope: token.scope,
+                client: {id: token.client_id},
+                user: {id: token.user_id}
+            })
         }
     })
 };

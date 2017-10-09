@@ -1,34 +1,59 @@
 import {error} from "util";
 
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var lessMiddleware = require('less-middleware');
-var OAuthServer = require('express-oauth-server');
-const { Pool } = require('pg');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const lessMiddleware = require('less-middleware');
+const OAuthServer = require('express-oauth-server');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
 
-const pool = new Pool()
-
-pool.query('SELECT * FROM users', (err, res) => {
-  console.log(err, res);
-  pool.end
-})
 const index = require('./routes/index');
 const register = require('./routes/register');
-const authorize = require('./routes/authorize');
 const clients = require('./routes/clients');
-const clientRoute = require('./routes/client');
+const playlists = require('./routes/playlists');
+
 
 const userModel = require('./models/user');
+const clientModel = require('./models/client');
+const app = express();
 
-var app = express();
+
+passport.use(new LocalStrategy(
+    function(username, password, callback) {
+        var bcrypt = require('bcryptjs');
+        userModel.getUserByUsername(username, function (err, user) {
+            if (err) { return callback(err); }
+            if (!user) { return callback(null, false, { message: 'User does not exist', username: '' }); }
+            bcrypt.compare(password, user.password, (err, res) => {
+                if (err) console.log(err);
+                if (res) return callback(null, user);
+                return callback(null, false, { message: 'Password is incorrect', username: username });
+            });
+        });
+    }
+));
+
+passport.serializeUser(function(user, callback) {
+    callback(null, user.id);
+});
+
+passport.deserializeUser(function(id, callback) {
+    userModel.getUserById(id, function (err, user) {
+        if (err) { return callback(err); }
+        callback(null, user);
+    });
+});
+
 
 app.oauth = new OAuthServer ({
   model: userModel
-})
+});
+
 
 
 // view engine setup
@@ -38,23 +63,61 @@ app.set('view engine', 'pug');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session( { secret: "Corgis are vastly superior to shibes", resave: true, saveUninitialized: false }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('corgi'));
 app.use(lessMiddleware(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', index);
 app.use('/register', register);
-app.use('/clients', clients);
-app.use('/client', clientRoute);
+app.use('/clients/', clients);
+app.use('/api/playlists/', playlists);
 //app.use('/users', users);
-app.get("/oauth/authorize", authorize);
+app.get('/oauth/authorize', (req, res) => {
+    if (req.user) {
+      if (!req.query.clientId) return res.send('Please send a clientID!');
+      clientModel.getClient(req.query.clientId, '', (err, usedClient) => {
+        if (err) return console.log(err);
+        if (!usedClient) return res.send('ERROR invalid client ID!');
+          res.render('authorize', {title: 'Authorize', scope: req.query.scope, client: usedClient, state: req.query.state, redirectUri: usedClient.redirect_url });
+        })
+    } else {
+      req.session.redirectTo = req.originalUrl;
+      res.redirect('/login');
+    }
+});
 app.post("/oauth/authorize", app.oauth.authorize());
 app.post("/oauth/token", app.oauth.token());
+
+app.get('/login', (req, res) => {
+        res.render('login', { msg: '', title: 'Login', username: '' });
+});
+
+app.post('/login', (req, res, next ) => {
+    passport.authenticate('local', function(err, user, info) {
+        if (err) { return next(err) }
+        if (!user) { return res.render('login', { msg: info.message, title: 'Login', username: info.username }) }
+        req.login(user, err => {
+          if (err) return next(err);
+          let redirectURL = '/';
+          if (req.session.redirectTo) redirectURL = req.session.redirectTo;
+          req.session.redirectTo = null;
+           res.redirect(redirectURL);
+        });
+    })(req, res, next);
+});
+
+
+
+
 // catch 404 and forward to error handler
+
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  let err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
