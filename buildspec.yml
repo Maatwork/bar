@@ -13,7 +13,7 @@ phases:
   post_build:
     commands:
       - echo Build completed
-      - chmod +R +x bin/*.sh
+      - chmod -R +x bin/*.sh
 artifacts:
   files:
     - appspec.yml
