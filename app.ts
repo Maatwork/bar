@@ -56,7 +56,7 @@ app.oauth = new OAuthServer ({
 });
 
 
-
+console.log('Setting viewengine!');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -113,7 +113,7 @@ app.post('/login', (req, res, next ) => {
 });
 
 
-
+console.log('Setting Errors!');
 
 // catch 404 and forward to error handler
 
@@ -133,5 +133,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+console.log('Setting module exports!!');
 module.exports = app;

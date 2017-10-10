@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('loading!');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -18,6 +19,7 @@ var playlists = require('./routes/playlists');
 var userModel = require('./models/user');
 var clientModel = require('./models/client');
 var app = express();
+console.log('Getting passport!');
 passport.use(new LocalStrategy(function (username, password, callback) {
     var bcrypt = require('bcryptjs');
     userModel.getUserByUsername(username, function (err, user) {
@@ -50,6 +52,7 @@ passport.deserializeUser(function (id, callback) {
 app.oauth = new OAuthServer({
     model: userModel
 });
+console.log('Setting viewengine!');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -110,6 +113,7 @@ app.post('/login', function (req, res, next) {
         });
     })(req, res, next);
 });
+console.log('Setting Errors!');
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -125,4 +129,5 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
+console.log('Setting module exports!!');
 module.exports = app;
