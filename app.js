@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('loading!');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var lessMiddleware = require('less-middleware');
@@ -12,6 +10,7 @@ var OAuthServer = require('express-oauth-server');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var session = require('express-session');
+var Logger = require('./models/logger');
 var index = require('./routes/index');
 var register = require('./routes/register');
 var clients = require('./routes/clients');
@@ -19,7 +18,6 @@ var playlists = require('./routes/playlists');
 var userModel = require('./models/user');
 var clientModel = require('./models/client');
 var app = express();
-console.log('Getting passport!');
 passport.use(new LocalStrategy(function (username, password, callback) {
     var bcrypt = require('bcryptjs');
     userModel.getUserByUsername(username, function (err, user) {
@@ -31,7 +29,7 @@ passport.use(new LocalStrategy(function (username, password, callback) {
         }
         bcrypt.compare(password, user.password, function (err, res) {
             if (err)
-                console.log(err);
+                Logger.log('error', err);
             if (res)
                 return callback(null, user);
             return callback(null, false, { message: 'Password is incorrect', username: username });
@@ -52,13 +50,12 @@ passport.deserializeUser(function (id, callback) {
 app.oauth = new OAuthServer({
     model: userModel
 });
-console.log('Setting viewengine!');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+app.use(Logger.getRequestLogger);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: "Corgis are vastly superior to shibes", resave: true, saveUninitialized: false }));
 app.use(bodyParser.json());
@@ -78,7 +75,7 @@ app.get('/oauth/authorize', function (req, res) {
             return res.send('Please send a clientID!');
         clientModel.getClient(req.query.clientId, '', function (err, usedClient) {
             if (err)
-                return console.log(err);
+                return Logger.log('error', err);
             if (!usedClient)
                 return res.send('ERROR invalid client ID!');
             res.render('authorize', { title: 'Authorize', scope: req.query.scope, client: usedClient, state: req.query.state, redirectUri: usedClient.redirect_url });
@@ -113,13 +110,13 @@ app.post('/login', function (req, res, next) {
         });
     })(req, res, next);
 });
-console.log('Setting Errors!');
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
+app.use(Logger.getErrorLogger);
 // error handler
 app.use(function (err, req, res, next) {
     // set locals, only providing error in development
@@ -129,5 +126,4 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-console.log('Setting module exports!!');
 module.exports = app;

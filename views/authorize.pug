@@ -13,6 +13,6 @@ block content
                         input#redirectUri.form-control(type='hidden', name='redirectUri', value=redirectUri)
                     div.form-group
                     div.form-group
-                    button#allow.btn.btn-success(type='submit', formaction="/authorize?allowed=true", name='allowed', value='true', autofocus='') Allow
+                    button#allow.btn.btn-success(type='submit', formaction="/oauth/authorize?allowed=true", name='allowed', value='true', autofocus='') Allow
                     br
-                    button#deny.btn.btn-danger(type='submit', formaction="/authorize?allowed=false", name='allowed', value='false', autofocus='') Deny
+                    button#deny.btn.btn-danger(type='submit', formaction="/oauth/authorize?allowed=false", name='allowed', value='false', autofocus='') Deny

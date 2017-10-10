@@ -3,11 +3,12 @@ var Pool = require('pg').Pool;
 var pool = new Pool();
 var client = require('../models/client');
 var bcrypt = require('bcryptjs');
+var Logger = require('../models/logger');
 module.exports.getAccessToken = function (bearerToken, callback) {
     var sql = 'SELECT access_token, access_token_expires_on, client_id, user_id, scope FROM tokens WHERE access_token = $1';
     pool.query(sql, [bearerToken], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, '');
         }
         else {
@@ -31,7 +32,7 @@ module.exports.getRefreshToken = function (bearerToken, callback) {
     var sql = 'SELECT client_id, refresh_token, refresh_token_expires_on, user_id FROM tokens WHERE refresh_token = $1';
     pool.query(sql, [bearerToken], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, null);
         }
         else {
@@ -46,7 +47,7 @@ module.exports.getRefreshToken = function (bearerToken, callback) {
     });
 };
 module.exports.verifyScope = function (token, scope) {
-    console.log("Verifying scope with token scope " + token.scope + " and general scope " + scope);
+    Logger.log('info', "Verifying scope with token scope " + token.scope + " and general scope " + scope);
     if (!token.scope) {
         return false;
     }
@@ -54,7 +55,7 @@ module.exports.verifyScope = function (token, scope) {
     return scope.split(' ').every(function (scope) { return authorizedScopes.indexOf(scope) != -1; });
 };
 module.exports.validateScope = function (user, client, scope) {
-    console.log("Validating scope with client scope " + client.scope + " and general scope " + scope);
+    Logger.log('info', "Validating scope with client scope " + client.scope + " and general scope " + scope);
     if (!scope.split(' ').every(function (s) { return client.scope.indexOf(s) != -1; }))
         return false;
     return scope;
@@ -64,7 +65,7 @@ module.exports.getUserByUsername = function (username, callback) {
     var sql = 'SELECT * FROM users WHERE username = $1';
     pool.query(sql, [username], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, '');
         }
         else {
@@ -76,7 +77,7 @@ module.exports.getUserById = function (id, callback) {
     var sql = 'SELECT * FROM users WHERE id = $1';
     pool.query(sql, [id], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, '');
         }
         else {
@@ -88,7 +89,7 @@ module.exports.getUser = function (username, password, callback) {
     var sql = 'SELECT * FROM users WHERE username = $1';
     pool.query(sql, [username], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, '');
         }
         else {
@@ -106,13 +107,13 @@ module.exports.getUser = function (username, password, callback) {
 module.exports.saveUser = function (username, password, res, callback) {
     bcrypt.genSalt(14, function (err, salt) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, username, res);
         }
         else {
             bcrypt.hash(password, salt, function (err, hash) {
                 if (err) {
-                    console.log(err);
+                    Logger.log('error', err);
                     callback(err, username, res);
                 }
                 else {
@@ -127,7 +128,7 @@ module.exports.saveAuthorizationCode = function (code, client, user, callback) {
     var sql = 'INSERT INTO authorization_codes(id, authorization_code, expires_on, redirect_url, scope, client_id, user_id) VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, $6) returning id, authorization_code, expires_on, redirect_url, scope, client_id, user_id';
     pool.query(sql, [code.authorizationCode, code.expiresAt, code.redirectUri, code.scope, client.id, user.id], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, null);
         }
         else {
@@ -139,7 +140,7 @@ module.exports.saveToken = function (token, client, user, callback) {
     var sql = 'INSERT INTO tokens(id, access_token, access_token_expires_on, refresh_token, refresh_token_expires_on, scope, client_id, user_id) VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, $6, $7) returning access_token, access_token_expires_on, refresh_token, refresh_token_expires_on, scope, client_id, user_id';
     pool.query(sql, [token.accessToken, token.accessTokenExpiresAt, token.refreshToken, token.refreshTokenExpiresAt, token.scope, client.id, user.id], function (err, result) {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, null);
         }
         else {

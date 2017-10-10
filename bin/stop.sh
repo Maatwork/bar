@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 cd /var/www/platform
-npm killall -INT node > stop.log || true
+pm2 unstartup
+sudo service nginx stop
+pm2 stop

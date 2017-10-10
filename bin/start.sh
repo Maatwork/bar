@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 cd /var/www/platform
-sudo node bin/www > /dev/null &
+pm2 start bin/www
+sudo service nginx start
+pm2 startup
