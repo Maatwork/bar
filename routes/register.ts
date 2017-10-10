@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var user = require('../models/user');
-var Logger = require('../models/logger');
-/* GET home page. */
+const express = require('express');
+const router = express.Router();
+const user = require('../models/user');
+const Logger = require('../models/logger');
+/* GET consthome page. */
 router.get('/', function(req, res, next) {
     res.render('register', { title: 'Register', username: '', password: ''});
 });

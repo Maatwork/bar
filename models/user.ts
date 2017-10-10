@@ -108,6 +108,18 @@ module.exports.getUser = function (username, password, callback) {
     })
 };
 
+module.exports.setUserBar = function (bar_id, user_id, callback) {
+    const sql = 'UPDATE users SET bar_id = $1  WHERE id = $2';
+    pool.query(sql, [bar_id, user_id], (err, result) => {
+        if (err) {
+            Logger.log('error', err);
+            callback(err, false);
+        } else {
+            callback(err, true)
+        }
+    })
+};
+
 module.exports.saveUser = function (username, password, res, callback) {
     bcrypt.genSalt(14, (err, salt) => {
         if (err) {

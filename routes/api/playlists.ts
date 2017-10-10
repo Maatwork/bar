@@ -1,11 +1,11 @@
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
-    model: require('../models/user')
+    model: require('../../models/user')
 });
 
 const express = require('express');
 const router = express.Router();
-const playlist = require('../models/playlist');
+const playlist = require('../../models/playlist');
 
 /* POST playlist. */
 router.post('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next) {

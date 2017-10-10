@@ -64,3 +64,4 @@ user.data.ignore
 routes/*.js
 app.js
 models/*.js
+config
