@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 cd /var/www/platform
-sudo node bin/www &
+sudo node bin/www > /dev/null &
