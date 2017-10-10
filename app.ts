@@ -17,6 +17,8 @@ const index = require('./routes/index');
 const register = require('./routes/register');
 const clients = require('./routes/clients');
 const playlists = require('./routes/playlists');
+const questions = require('./routes/questions');
+const categories = require('./routes/questions');
 
 
 const userModel = require('./models/user');
@@ -76,6 +78,8 @@ app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
+app.use('/categories/', categories);
+app.use('/question/', question);
 //app.use('/users', users);
 app.get('/oauth/authorize', (req, res) => {
     if (req.user) {

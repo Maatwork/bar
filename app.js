@@ -15,6 +15,8 @@ var index = require('./routes/index');
 var register = require('./routes/register');
 var clients = require('./routes/clients');
 var playlists = require('./routes/playlists');
+var questions = require('./routes/questions');
+var categories = require('./routes/questions');
 var userModel = require('./models/user');
 var clientModel = require('./models/client');
 var app = express();
@@ -68,6 +70,8 @@ app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
+app.use('/categories/', categories);
+app.use('/question/', question);
 //app.use('/users', users);
 app.get('/oauth/authorize', function (req, res) {
     if (req.user) {
