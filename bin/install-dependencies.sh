@@ -6,4 +6,4 @@ sudo yum install -y nodejs npm > ./log
 
 cd /var/www/platform
 npm update > ./update.log
-npm install pm2 -g
+sudo npm install pm2 -g
