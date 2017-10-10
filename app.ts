@@ -1,5 +1,6 @@
 import {error} from "util";
 
+console.log('loading!');
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -22,7 +23,7 @@ const userModel = require('./models/user');
 const clientModel = require('./models/client');
 const app = express();
 
-
+console.log('Getting passport!');
 passport.use(new LocalStrategy(
     function(username, password, callback) {
         var bcrypt = require('bcryptjs');
