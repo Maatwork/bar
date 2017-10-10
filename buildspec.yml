@@ -25,9 +25,10 @@ artifacts:
     - appspec.yml
     - bin/*
     - models/*
-    - node-modules/*
+    - node_modules/*
     - public/*
     - routes/*
     - views/*
     - package.json
     - app.js
+    - db/*
