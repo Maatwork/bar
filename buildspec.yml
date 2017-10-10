@@ -26,10 +26,8 @@ artifacts:
     - bin/**/*
     - models/**/*
     - node_modules/**/*
-    - public/*
-    - routes/*
+    - public/**/*
     - routes/**/*
-    - views/*
     - views/**/*
     - app.js
-    - db/*
+    - db/**/*
