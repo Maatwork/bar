@@ -2,4 +2,3 @@
 cd /var/www/platform
 pm2 start bin/www
 sudo service nginx start
-pm2 startup

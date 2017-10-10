@@ -53,42 +53,14 @@ sudo service nginx restart
 sudo mkdir /var/www/platform | true
 sudo mkdir /var/www/platform/config | true
 
-cat > /var/www/platform/config/config.json <<EOF
+cd /tmp/
+cat > config.json <<EOF
 
-const fs = require('fs');
-
-module.exports = {
-    development: {
-        username: 'Alexander',
-        password: ',3AZ{cd%v]`[8fA[',
-        database: 'corgi',
-        host: 'platform-master.cdxo05y3kdwr.eu-central-1.rds.amazonaws.com',
-        dialect: 'postgres'
-    },
-    test: {
-        username: 'Alexander',
-        password: ',3AZ{cd%v]`[8fA[',
-        database: 'corgi',
-        host: 'platform-master.cdxo05y3kdwr.eu-central-1.rds.amazonaws.com',
-        dialect: 'postgres'
-    },
-    production: {
-        username: 'Alexander',
-        password: ',3AZ{cd%v]`[8fA[',
-        database: 'corgi',
-        host: 'platform-master.cdxo05y3kdwr.eu-central-1.rds.amazonaws.com',
-        dialect: 'postgres'
-    }
-};
+{"username": "Alexander",
+"password": ",3AZ{cd%v]`[8fA[",
+"database": "corgi",
+"host": "platform-master.cdxo05y3kdwr.eu-central-1.rds.amazonaws.com",
+"dialect": "postgres"}
 
 EOF
-
-cat > /var/www/platform/.sequelizerc <<EOF
-
-const path = require('path');
-
-module.exports = {
-  'config': path.resolve('config', 'config.json')
-}
-
-EOF
+sudo cp config.json /var/www/platform/config/config.json
