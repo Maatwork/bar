@@ -27,7 +27,7 @@ upstream nodejs_platform {
 
 server {
     listen 80;
-    server_name platform;
+    server_name "";
     root /var/home/www;
 
     location / {
@@ -46,7 +46,7 @@ server {
 
 EOF
 
-sudo cp platform.com /etc/nginx/sites-available/platform.com
+sudo cp platform.com /etc/nginx/sites-enabled/platform.com
 
 sudo service nginx restart
 
