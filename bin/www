@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('bar:server');
 var http = require('http');
-console.log('HTTP Required!!');
+
 /**
  * Get port from environment and store in Express.
  */
@@ -18,7 +18,6 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-console.log('Creating HTTP Server!!');
 var server = http.createServer(app);
 
 /**
@@ -28,7 +27,7 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-console.log('Listening!');
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -55,7 +54,6 @@ function normalizePort(val) {
 
 function onError(error) {
   if (error.syscall !== 'listen') {
-    console.log(error);
     throw error;
   }
 
@@ -81,7 +79,7 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-console.log("Reached OnListening!");
+
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
