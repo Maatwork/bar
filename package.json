@@ -14,19 +14,24 @@
     "express": "~4.15.5",
     "express-oauth-server": "^2.0.0",
     "express-session": "^1.15.6",
+    "express-winston": "^2.4.0",
     "less-middleware": "~2.2.1",
     "morgan": "~1.9.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.3.0",
     "pug": "^2.0.0-rc.4",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "winston": "^2.4.0",
+    "winston-daily-rotate-file": "^1.7.2",
+    "winston-telegram": "^1.2.1"
   },
   "devDependencies": {
     "@types/node": "^8.0.32",
     "@types/oauth2-server": "^3.0.1",
     "@types/passport": "^0.3.4",
     "@types/pg": "^7.1.4",
+    "@types/winston": "^2.3.6",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
     "typescript": "^2.5.3"

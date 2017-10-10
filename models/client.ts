@@ -1,12 +1,14 @@
 const { Pool } = require('pg');
 
 const pool = new Pool();
+const Logger = require('../models/logger');
+
 
 module.exports.getClient = function (clientId: String, clientSecret: String, callback: Function) {
     const sql = 'SELECT id, grants, client_secret, redirect_url, scopes FROM clients WHERE id = $1';
     pool.query(sql, [clientId], (err, result) => {
         if (err) {
-            console.log(err);
+            Logger.log('error', err);
             callback(err, '');
         } else {
             const client = result.rows[0]; //select the first. #lazy

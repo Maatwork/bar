@@ -1,10 +1,8 @@
 import {error} from "util";
 
-console.log('loading!');
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
-const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const lessMiddleware = require('less-middleware');
@@ -12,6 +10,8 @@ const OAuthServer = require('express-oauth-server');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
+const Logger = require('./models/logger');
+
 
 const index = require('./routes/index');
 const register = require('./routes/register');
@@ -23,7 +23,6 @@ const userModel = require('./models/user');
 const clientModel = require('./models/client');
 const app = express();
 
-console.log('Getting passport!');
 passport.use(new LocalStrategy(
     function(username, password, callback) {
         var bcrypt = require('bcryptjs');
@@ -31,7 +30,7 @@ passport.use(new LocalStrategy(
             if (err) { return callback(err); }
             if (!user) { return callback(null, false, { message: 'User does not exist', username: '' }); }
             bcrypt.compare(password, user.password, (err, res) => {
-                if (err) console.log(err);
+                if (err) Logger.log('error', err);
                 if (res) return callback(null, user);
                 return callback(null, false, { message: 'Password is incorrect', username: username });
             });
@@ -56,14 +55,14 @@ app.oauth = new OAuthServer ({
 });
 
 
-console.log('Setting viewengine!');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+app.use(Logger.getRequestLogger);
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session( { secret: "Corgis are vastly superior to shibes", resave: true, saveUninitialized: false }));
 app.use(bodyParser.json());
@@ -82,7 +81,7 @@ app.get('/oauth/authorize', (req, res) => {
     if (req.user) {
       if (!req.query.clientId) return res.send('Please send a clientID!');
       clientModel.getClient(req.query.clientId, '', (err, usedClient) => {
-        if (err) return console.log(err);
+        if (err) return Logger.log('error', err);
         if (!usedClient) return res.send('ERROR invalid client ID!');
           res.render('authorize', {title: 'Authorize', scope: req.query.scope, client: usedClient, state: req.query.state, redirectUri: usedClient.redirect_url });
         })
@@ -112,9 +111,6 @@ app.post('/login', (req, res, next ) => {
     })(req, res, next);
 });
 
-
-console.log('Setting Errors!');
-
 // catch 404 and forward to error handler
 
 app.use(function(req, res, next) {
@@ -122,6 +118,8 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+app.use(Logger.getErrorLogger);
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -133,5 +131,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-console.log('Setting module exports!!');
+
 module.exports = app;
