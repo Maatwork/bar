@@ -1,22 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const user = require('../models/user');
+const userModel = require('../models/user');
 const Logger = require('../models/logger');
 /* GET consthome page. */
 router.get('/', function(req, res, next) {
-    res.render('register', { title: 'Register', username: '', password: ''});
+    res.render('user/register', { title: 'Register', username: '', password: ''});
 });
 router.post('/', function(req, res, next) {
-    user.saveUser(req.body.username, req.body.password, res, handleRegistration)
+    if (!req.body.username.trim() || !req.body.password.trim()) return res.render('user/register',
+        { title: 'Register', username: req.body.username, password: req.body.password, msg: 'Please fill in a username and password!'});
+    userModel.saveUser(req.body.username, req.body.password, req, res, handleRegistration)
 });
 
-function handleRegistration(err, username, res)
+function handleRegistration(err, user, req, res)
 {
     if (err) {
         Logger.log('error', err);
-        res.render('register', {title: 'Register', msg: err, username: username, password: ''})
+        res.render('user/register', {title: 'Register', msg: err, username: user.username, password: ''})
     } else {
-        res.render('index', {title: 'Success'})
+        userModel.getUser(user.username, user.password, (err, user) => {
+            if (err) return Logger.log('error', err);
+            req.login(user, (err) => {
+                if (!err) {
+                    res.redirect('/bar')
+                } else Logger.log('error', err);
+            });
+        })
     }
 }
 
