@@ -18,6 +18,7 @@ const register = require('./routes/register');
 const clients = require('./routes/clients');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
+const barApi = require('./routes/api/bar');
 
 require('./db/foreignkeys').estabilishFKs();
 //require('./db/database').getDb.sync({force: true});
@@ -79,6 +80,7 @@ app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
+app.use('/api/bars/', barApi);
 app.use('/bar/', barLocal);
 //app.use('/users', users);
 app.get('/oauth/authorize', (req, res) => {

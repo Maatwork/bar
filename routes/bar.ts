@@ -4,7 +4,7 @@ const bar = require('../models/bar').Bar;
 const Logger = require('../models/logger');
 const user = require('../models/user');
 
-/* GET clients. */
+/* GET bars. */
 router.get('/', function(req, res, next) {
     if (req.user) {
         if (req.user.bar_id) {

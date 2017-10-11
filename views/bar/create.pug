@@ -1,5 +1,10 @@
 extends ../layout
 
+block scripts
+    script(src="https://code.jquery.com/jquery-1.10.2.min.js")
+    script(src="http://maps.google.com/maps/api/js?sensor=false&libraries=places")
+    script(src="javascripts/locationpicker.jquery.js")
+
 block content
     .main.container
         .row
@@ -17,4 +22,6 @@ block content
                     div.form-group
                         label(for='location') Address:
                         input#location.form-control(type='text' name='location', value=location)
+                     //   div#map.map
+                    //script $('#map').locationpicker();
                     button.btn.btn-primary(type='submit') Create Bar

@@ -49,7 +49,7 @@ module.exports.getRefreshToken = function (bearerToken, callback) {
 };
 
 module.exports.verifyScope = (token, scope) => {
-    Logger.log('info', "Verifying scope with token scope " + token.scope + " and general scope " + scope);
+  //  Logger.log('info', "Verifying scope with token scope " + token.scope + " and general scope " + scope);
     if (!token.scope) {
         return false;
     }
@@ -58,7 +58,7 @@ module.exports.verifyScope = (token, scope) => {
 };
 
 module.exports.validateScope = (user, client, scope) => {
-    Logger.log('info', "Validating scope with client scope " + client.scope + " and general scope " + scope);
+ //   Logger.log('info', "Validating scope with client scope " + client.scope + " and general scope " + scope);
     if (!scope.split(' ').every(s => client.scope.indexOf(s) != -1)) return false;
     return scope;
 };
@@ -120,19 +120,19 @@ module.exports.setUserBar = function (bar_id, user_id, callback) {
     })
 };
 
-module.exports.saveUser = function (username, password, res, callback) {
+module.exports.saveUser = function (username, password, req, resp, callback) {
     bcrypt.genSalt(14, (err, salt) => {
         if (err) {
             Logger.log('error', err);
-            callback(err, username, res)
+            callback(err, { username: username }, req, resp)
         } else {
         bcrypt.hash(password, salt, (err, hash) => {
             if (err) {
                 Logger.log('error', err);
-                callback(err, username, res)
+                callback(err, { username: username }, req, resp)
             } else {
                 const sql = 'INSERT INTO users(id, username, password) VALUES(uuid_generate_v4(), $1, $2) returning id, username, password';
-                pool.query(sql, [username, hash], (err, _) => callback(err, username, res));
+                pool.query(sql, [username, hash], (err, _) => callback(err, { username: username, password: password }, req, resp));
             }
         });
         }
