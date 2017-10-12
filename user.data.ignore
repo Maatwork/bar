@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 sudo cat > /etc/profile.d/postgresenv.sh <<EOF
 
 export PGHOST='platform-master.cdxo05y3kdwr.eu-central-1.rds.amazonaws.com'
