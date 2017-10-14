@@ -66,3 +66,4 @@ app.js
 models/*.js
 config
 /user.data.ignore
+workspace.xml

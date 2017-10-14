@@ -23,7 +23,7 @@ router.put('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next) 
     })
 });
 
-router.del('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next) {
+router.delete('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next) {
     playlist.deletePlaylist(req.body.name, req.body.songs, res.locals.oauth.token.user.id, req.body.playlisttype, req.body.startdatetime, req.body.enddatetime, function(error, result){
         if (error) res.send('false');
         else res.send(result);
