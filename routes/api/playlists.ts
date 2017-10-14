@@ -16,4 +16,18 @@ router.post('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next)
     })
 });
 
+router.put('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next) {
+    playlist.updatePlaylist(req.body.name, req.body.songs, res.locals.oauth.token.user.id, req.body.playlisttype, req.body.startdatetime, req.body.enddatetime, function(error, result){
+        if (error) res.send('false');
+        else res.send(result);
+    })
+});
+
+router.del('/', oauth.authenticate({scope:"Indexer"}), function(req, res, next) {
+    playlist.deletePlaylist(req.body.name, req.body.songs, res.locals.oauth.token.user.id, req.body.playlisttype, req.body.startdatetime, req.body.enddatetime, function(error, result){
+        if (error) res.send('false');
+        else res.send(result);
+    })
+});
+
 module.exports = router;
