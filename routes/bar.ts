@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const bar = require('../models/bar').Bar;
 const Logger = require('../models/logger');
-const user = require('../models/user');
+const User = require('../models/user').User;
 
 /* GET bars. */
 router.get('/', function(req, res, next) {
     if (req.user) {
-        if (req.user.bar_id) {
-            bar.findOne({where: { id: req.user.bar_id }})
+        if (req.user.barId) {
+            bar.findOne({where: { id: req.user.barId }})
                 .then(bar => res.send(bar))
                 .catch(error => Logger(error))
         } else {
@@ -22,6 +22,10 @@ router.get('/', function(req, res, next) {
 
 /* POST bar. */
 router.post('/', function(req, res, next) {
+    if (!req.user) {
+        req.session.redirectTo = req.originalUrl;
+        return res.redirect('/login');
+    }
     let errorMessage: String = '';
     if (!req.body.name) errorMessage += 'Please fill in your bar name';
     if (!req.body.description) errorMessage ? errorMessage += ', bar description' : errorMessage = 'Please fill in your bar description';
@@ -32,13 +36,11 @@ router.post('/', function(req, res, next) {
     } else {
         bar.create({ name: req.body.name, description: req.body.description, location: req.body.location })
             .then(bar => {
-                req.user.bar_id = bar.id;
-                user.setUserBar(bar.id, req.user.id, (err, res) => {
-                    if (err) return Logger.log('error', err);
-                    res.redirect('bar/create');
-                })
+                req.user.barId = bar.id;
+                User.update({barId: bar.id}, {where: {id: req.user.id}})
+                    .then(res.redirect('bar'))
             })
-            .catch(error => Logger.log('error', error))
+            .catch(error => res.render('bar/create', { title: 'Create a bar', msg: error.errors[0].message}))
     }
     });
 

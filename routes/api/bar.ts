@@ -3,9 +3,13 @@ const router = express.Router();
 const bar = require('../../models/bar').Bar;
 const Logger = require('../../models/logger');
 const user = require('../../models/user');
+const OAuth2Server = require('express-oauth-server');
+const oauth = new OAuth2Server({
+    model: require('../../db/database')
+});
 
 /* POST bar. */
-router.post('/', function(req, res, next) {
+router.post('/', oauth.authenticate({scope:"bar"}), function(req, res, next) {
     let errorMessage: String = '';
     if (!req.body.name) errorMessage += 'Please fill in your bar name';
     if (!req.body.description) errorMessage ? errorMessage += ', bar description' : errorMessage = 'Please fill in your bar description';
@@ -16,12 +20,10 @@ router.post('/', function(req, res, next) {
     } else {
         bar.create({ name: req.body.name, description: req.body.description, location: req.body.location })
             .then(bar => {
-                user.setUserBar(bar.id, req.body.user.id, (err, res) => {
-                    if (err) return Logger.log('error', err);
-                    res.send(bar);
-                })
+                User.update({barId: bar.id}, {where: {id: req.user.id}})
+                    .then(res.redirect('bar'))
             })
-            .catch(error => Logger.log('error', error))
+            .catch(error => res.send(error.errors[0].message))
     }
 });
 

@@ -8,7 +8,7 @@ module.exports.Bar  = db.define('bar', {
         type: types.UUID, unique: true, primaryKey: true, defaultValue: db.fn('uuid_generate_v4')
     },
     name: {
-        type: types.TEXT, allowNull: false
+        type: types.TEXT, unique: { msg: 'Only one entry allowed per bar.'}, allowNull: false
     },
     description: {
         type: types.TEXT
