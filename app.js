@@ -71,7 +71,7 @@ app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
 app.use('/categories/', categories);
-app.use('/question/', question);
+app.use('/question/', questions);
 //app.use('/users', users);
 app.get('/oauth/authorize', function (req, res) {
     if (req.user) {
