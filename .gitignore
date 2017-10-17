@@ -67,3 +67,9 @@ models/*.js
 config
 /user.data.ignore
 workspace.xml
+.idea/inspectionProfiles/
+db/database.js
+db/foreignkeys.js
+public/images/
+routes/api/bar.js
+routes/api/playlists.js
