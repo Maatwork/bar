@@ -8,8 +8,14 @@ const oauth = new OAuth2Server({
     model: require('../../db/database')
 });
 
+router.get('/', (req, res) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+   bar.findAll({raw: true}).then(bars => {
+       res.send(bars);
+   })
+});
 /* POST bar. */
-router.post('/', oauth.authenticate({scope:"bar"}), function(req, res, next) {
+router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
     let errorMessage: String = '';
     if (!req.body.name) errorMessage += 'Please fill in your bar name';
     if (!req.body.description) errorMessage ? errorMessage += ', bar description' : errorMessage = 'Please fill in your bar description';

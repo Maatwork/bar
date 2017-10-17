@@ -5,6 +5,7 @@ const authorizationCode = require('../models/authorizationCode').AuthorizationCo
 const token = require('../models/token').Token;
 const user = require('../models/user').User;
 const db = require('../db/database').getDb;
+
 module.exports.estabilishFKs = () => {
     bar.hasMany(event);
     authorizationCode.belongsTo(user);
