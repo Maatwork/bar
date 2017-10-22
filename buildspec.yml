@@ -23,11 +23,11 @@ phases:
 artifacts:
   files:
     - appspec.yml
-    - bin/*
-    - models/*
-    - node-modules/*
-    - public/*
-    - routes/*
-    - views/*
-    - package.json
+    - bin/**/*
+    - models/**/*
+    - node_modules/**/*
+    - public/**/*
+    - routes/**/*
+    - views/**/*
     - app.js
+    - db/**/*

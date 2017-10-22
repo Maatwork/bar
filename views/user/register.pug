@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+    .main.container
+        .row
+            .col-md-6.col-md-offset-3
+                h1.display-4.m-b-2 #{title}
+                if msg
+                    .alert.alert-danger #{msg}
+                form(method='POST' action='/register')
+                    div.form-group
+                        label(for='username') Username:
+                        input#username.form-control(type='username', name='username')
+                    div.form-group
+                        label(for='pw') Email:
+                        input#email.form-control(type='email' name='email')
+                    div.form-group
+                        label(for='pw') Password:
+                        input#pw.form-control(type='password' name='password')
+                    div.form-group
+                    button.btn.btn-primary(type='submit') Sign up

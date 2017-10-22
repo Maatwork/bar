@@ -23,3 +23,8 @@ hooks:
    - location: bin/start.sh
      timeout: 60
      runas: ec2-user
+     
+ ValidateServices:
+   - location: bin/verify.sh
+     timeout: 60
+     runas: ec2-user
