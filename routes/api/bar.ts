@@ -7,7 +7,6 @@ const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
     model: require('../../db/database')
 });
-
 router.get('/', (req, res) => {
    bar.findAll({raw: true}).then(bars => {
        res.send(bars);
