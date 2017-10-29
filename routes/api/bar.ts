@@ -9,7 +9,6 @@ const oauth = new OAuth2Server({
 });
 
 router.get('/', (req, res) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
    bar.findAll({raw: true}).then(bars => {
        res.send(bars);
    })

@@ -71,6 +71,16 @@ module.exports.saveToken = function (token, client, user) {
     });
 };
 
+module.exports.revokeToken = (token) => {
+    return Token.destroy({where: {refresh_token: token.refreshToken}})
+        .then(res => {
+            return res
+        })
+        .catch((err) => {
+            return Logger.log('error', err)
+        });
+};
+
 module.exports.verifyScope = (token, scope) => {
    if (!token.scope) {
         return false;
@@ -133,5 +143,15 @@ module.exports.getAuthorizationCode = (code) => {
                 user: {id: result.userId}
             }
         })
+};
+
+module.exports.revokeAuthorizationCode = (code) => {
+    AuthorizationCode.destroy({where: {authorization_code: code.code}})
+        .then(res => {
+            return res
+        })
+        .catch((err) => {
+        return Logger.log('error', err)
+    });
 };
 

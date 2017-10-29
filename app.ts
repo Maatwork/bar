@@ -28,6 +28,11 @@ const User = require('./models/user').User;
 const Client = require('./models/client').Client;
 const app = express();
 
+let noCORS = function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    next()
+}
+
 passport.use(new LocalStrategy((username: String, password: String, callback: Function) => {
         let bcrypt = require('bcryptjs');
         User.findOne({where: {username: username}}, {raw: true}).
@@ -81,8 +86,8 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
-app.use('/api/playlists/', playlists);
-app.use('/api/bars/', barApi);
+app.use('/api/playlists/', noCORS, playlists);
+app.use('/api/bars/', noCORS, barApi);
 app.use('/bar/', barLocal);
 app.use('/oauth/me', me);
 
@@ -102,8 +107,12 @@ app.get('/oauth/authorize', (req, res) => {
     }
 });
 
-app.post("/oauth/authorize", app.oauth.authorize());
-app.post("/oauth/token", app.oauth.token());
+app.post("/oauth/authorize", noCORS, app.oauth.authorize());
+app.options("/oauth/token", noCORS, (req, res) => {
+    res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.send(200);
+});
+app.post("/oauth/token", noCORS, app.oauth.token());
 
 app.get('/login', (req, res) => {
         res.render('user/login', { msg: '', title: 'Login', username: '' });
