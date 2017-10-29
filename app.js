@@ -14,27 +14,30 @@ var Logger = require('./models/logger');
 var index = require('./routes/index');
 var register = require('./routes/register');
 var clients = require('./routes/clients');
-var playlists = require('./routes/playlists');
-var questions = require('./routes/questions');
-var categories = require('./routes/questions');
-var userModel = require('./models/user');
-var clientModel = require('./models/client');
+var questions = require('./routes/api/questions');
+var categories = require('./routes/api/categories');
+var barLocal = require('./routes/bar');
+var playlists = require('./routes/api/playlists');
+var barApi = require('./routes/api/bar');
+require('./db/foreignkeys').estabilishFKs();
+//require('./db/database').getDb.sync({force: true});
+var User = require('./models/user').User;
+var Client = require('./models/client').Client;
 var app = express();
+//require('./db/foreignkeys').estabilishFKs();
+require('./db/database').getDb.sync();
 passport.use(new LocalStrategy(function (username, password, callback) {
     var bcrypt = require('bcryptjs');
-    userModel.getUserByUsername(username, function (err, user) {
-        if (err) {
-            return callback(err);
-        }
+    User.findOne({ where: { username: username } }, { raw: true }).
+        then(function (user) {
         if (!user) {
             return callback(null, false, { message: 'User does not exist', username: '' });
         }
-        bcrypt.compare(password, user.password, function (err, res) {
-            if (err)
-                Logger.log('error', err);
-            if (res)
-                return callback(null, user);
-            return callback(null, false, { message: 'Password is incorrect', username: username });
+        bcrypt.compare(password, user.password)
+            .then(function (res) {
+            if (!res)
+                return callback(null, false, { message: 'Password is incorrect', username: username });
+            return callback(null, user);
         });
     });
 }));
@@ -42,15 +45,17 @@ passport.serializeUser(function (user, callback) {
     callback(null, user.id);
 });
 passport.deserializeUser(function (id, callback) {
-    userModel.getUserById(id, function (err, user) {
-        if (err) {
-            return callback(err);
+    User.findOne({ where: { id: id } }).then(function (user) {
+        if (user) {
+            return callback(null, user);
         }
-        callback(null, user);
+        else {
+            callback(false, false);
+        }
     });
 });
 app.oauth = new OAuthServer({
-    model: userModel
+    model: require('./models/oAuthModel')
 });
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -70,19 +75,20 @@ app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
-app.use('/categories/', categories);
-app.use('/question/', questions);
+app.use('/api/categories/', categories);
+app.use('/api/questions/', questions);
+app.use('/api/bars/', barApi);
+app.use('/bar/', barLocal);
 //app.use('/users', users);
 app.get('/oauth/authorize', function (req, res) {
     if (req.user) {
         if (!req.query.clientId)
             return res.send('Please send a clientID!');
-        clientModel.getClient(req.query.clientId, '', function (err, usedClient) {
-            if (err)
-                return Logger.log('error', err);
-            if (!usedClient)
+        Client.findOne({ where: { id: req.query.clientId } }, { raw: true })
+            .then(function (client) {
+            if (!client)
                 return res.send('ERROR invalid client ID!');
-            res.render('authorize', { title: 'Authorize', scope: req.query.scope, client: usedClient, state: req.query.state, redirectUri: usedClient.redirect_url });
+            res.render('oauth/authorize', { title: 'Authorize', scope: req.query.scope, client: client, state: req.query.state, redirectUri: client.redirect_url });
         });
     }
     else {
@@ -93,7 +99,7 @@ app.get('/oauth/authorize', function (req, res) {
 app.post("/oauth/authorize", app.oauth.authorize());
 app.post("/oauth/token", app.oauth.token());
 app.get('/login', function (req, res) {
-    res.render('login', { msg: '', title: 'Login', username: '' });
+    res.render('user/login', { msg: '', title: 'Login', username: '' });
 });
 app.post('/login', function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
@@ -101,7 +107,7 @@ app.post('/login', function (req, res, next) {
             return next(err);
         }
         if (!user) {
-            return res.render('login', { msg: info.message, title: 'Login', username: info.username });
+            return res.render('user/login', { msg: info.message, title: 'Login', username: info.username });
         }
         req.login(user, function (err) {
             if (err)

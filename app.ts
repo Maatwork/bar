@@ -16,9 +16,8 @@ const Logger = require('./models/logger');
 const index = require('./routes/index');
 const register = require('./routes/register');
 const clients = require('./routes/clients');
-const playlists = require('./routes/playlists');
-const questions = require('./routes/questions');
-const categories = require('./routes/questions');
+const questions = require('./routes/api/questions');
+const categories = require('./routes/api/categories');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
@@ -30,6 +29,12 @@ require('./db/foreignkeys').estabilishFKs();
 const User = require('./models/user').User;
 const Client = require('./models/client').Client;
 const app = express();
+
+
+//require('./db/foreignkeys').estabilishFKs();
+require('./db/database').getDb.sync();
+
+
 
 passport.use(new LocalStrategy((username: String, password: String, callback: Function) => {
         let bcrypt = require('bcryptjs');
@@ -85,8 +90,8 @@ app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
-app.use('/categories/', categories);
-app.use('/question/', questions);
+app.use('/api/categories/', categories);
+app.use('/api/questions/', questions);
 app.use('/api/bars/', barApi);
 app.use('/bar/', barLocal);
 //app.use('/users', users);
@@ -104,6 +109,7 @@ app.get('/oauth/authorize', (req, res) => {
       res.redirect('/login');
     }
 });
+
 
 app.post("/oauth/authorize", app.oauth.authorize());
 app.post("/oauth/token", app.oauth.token());
