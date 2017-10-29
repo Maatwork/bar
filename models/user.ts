@@ -25,22 +25,3 @@ module.exports.User = db.define('user', {
     }
     }
     );
-//
-// module.exports.saveUser = function (username, password, req, resp, callback) {
-//     bcrypt.genSalt(14, (err, salt) => {
-//         if (err) {
-//             Logger.log('error', err);
-//             callback(err, { username: username }, req, resp)
-//         } else {
-//             bcrypt.hash(password, salt, (err, hash) => {
-//                 if (err) {
-//                     Logger.log('error', err);
-//                     callback(err, { username: username }, req, resp)
-//                 } else {
-//                     const sql = 'INSERT INTO users(id, username, password) VALUES(uuid_generate_v4(), $1, $2) returning id, username, password';
-//                     pool.query(sql, [username, hash], (err, _) => callback(err, { username: username, password: password }, req, resp));
-//                 }
-//             });
-//         }
-//     });
-// };

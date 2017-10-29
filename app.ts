@@ -19,9 +19,10 @@ const clients = require('./routes/clients');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
+const me = require('./routes/oauth/me');
 
 require('./db/foreignkeys').estabilishFKs();
-//require('./db/database').getDb.sync({force: true});
+require('./db/database').getDb.sync();
 
 const User = require('./models/user').User;
 const Client = require('./models/client').Client;
@@ -83,6 +84,8 @@ app.use('/clients/', clients);
 app.use('/api/playlists/', playlists);
 app.use('/api/bars/', barApi);
 app.use('/bar/', barLocal);
+app.use('/oauth/me', me);
+
 //app.use('/users', users);
 app.get('/oauth/authorize', (req, res) => {
     if (req.user) {

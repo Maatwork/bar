@@ -1,5 +1,3 @@
-import {error} from "util";
-
 const Client = require('../models/client').Client;
 const Token = require('../models/token').Token;
 const User = require('../models/user').User;
@@ -13,7 +11,6 @@ module.exports.getClient = (clientId: String, clientSecret: String) => {
     let condition: any;
     if (clientSecret)  condition = { id: clientId, client_secret: clientSecret };
     else condition = { id: clientId};
-    console.log('quite client');
     return Client.findOne({where: condition})
         .then((client: any) => {
         return {
@@ -27,8 +24,6 @@ module.exports.getClient = (clientId: String, clientSecret: String) => {
 };
 
 module.exports.getAccessToken = function(bearerToken) {
-    console.log("not client");
-
     return Token.findOne({
         attributes: ['access_token', 'access_token_expires_on', 'clientId', 'userId', 'scope'],
         where: { access_token: bearerToken }
@@ -44,8 +39,6 @@ module.exports.getAccessToken = function(bearerToken) {
 };
 
 module.exports.getRefreshToken = function (bearerToken) {
-    console.log("not client");
-
     return Token.findOne({
         attributes: ['refresh_token', 'refresh_token_expires_on', 'clientId', 'userId', 'scope'],
         where: { refresh_token: bearerToken }
@@ -61,8 +54,6 @@ module.exports.getRefreshToken = function (bearerToken) {
 };
 
 module.exports.saveToken = function (token, client, user) {
-    console.log("not client");
-
     return Token.create({
         access_token: token.accessToken, access_token_expires_on: token.accessTokenExpiresAt,
         refresh_token: token.refreshToken, refresh_token_expires_on: token.refreshTokenExpiresAt,
@@ -81,9 +72,7 @@ module.exports.saveToken = function (token, client, user) {
 };
 
 module.exports.verifyScope = (token, scope) => {
-    console.log("not client");
-
-    if (!token.scope) {
+   if (!token.scope) {
         return false;
     }
     const authorizedScopes = token.scope.split(' ');
@@ -91,15 +80,11 @@ module.exports.verifyScope = (token, scope) => {
 };
 
 module.exports.validateScope = (user, client, scope) => {
-    console.log("not client");
-
     if (!scope.split(' ').every(s => client.scope.indexOf(s) != -1)) return false;
     return scope;
 };
 
 module.exports.getUser = (username, password) => {
-    console.log("not client");
-
     return User.findOne({where: {
         username: username,
     }}, { raw: true}).then(user => {
@@ -114,8 +99,6 @@ module.exports.getUser = (username, password) => {
 };
 
 module.exports.getUserFromClient = (client) => {
-    console.log("not client");
-
     return User.findOne({where: {id: client.userId}}, {raw: true})
         .then(user => {
             return user
@@ -123,7 +106,6 @@ module.exports.getUserFromClient = (client) => {
 };
 
 module.exports.saveAuthorizationCode = (code, client, user) => {
-    console.log("not client");
     return AuthorizationCode.create({authorization_code: code.authorizationCode, expires_on: code.expiresAt,
             redirect_url: code.redirectUri, scope: code.scope, clientId: client.id, userId: user.id},
         {raw: true}).then(newCode => {
@@ -139,7 +121,6 @@ module.exports.saveAuthorizationCode = (code, client, user) => {
 };
 
 module.exports.getAuthorizationCode = (code) => {
-    console.log("not client");
     return AuthorizationCode.findOne({where: {authorization_code: code.authorizationCode}})
         .then(result => {
             return {
