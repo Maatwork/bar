@@ -12,6 +12,15 @@ router.get('/', (req, res) => {
        res.send(bars);
    })
 });
+
+router.get('/:barId', (req, res) => {
+    if (!req.params.barId) return res.sendStatus(400);
+
+    bar.findOne({where: {id: req.params.barId}})
+        .then(bar => res.send(bar))
+        .catch(err => Logger.log('error', err))
+});
+
 /* POST bar. */
 router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
     let errorMessage: String = '';
