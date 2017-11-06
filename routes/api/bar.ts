@@ -7,6 +7,7 @@ const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
     model: require('../../models/oauthmodel')
 });
+
 router.get('/', (req, res) => {
    bar.findAll({raw: true}).then(bars => {
        res.send(bars);
@@ -32,7 +33,7 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         res.send(errorMessage);
     } else {
 
-            bar.create({ name: req.body.name, description: req.body.description, location: req.body.location, photos: req.body.photos })
+            bar.create({ name: req.body.name, description: req.body.description, location: req.body.location, photos: JSON.parse(req.body.photos) })
                 .then(bar => {
                     User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
                         .then(res.redirect('bar'))
