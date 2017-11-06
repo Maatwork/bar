@@ -31,13 +31,14 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         errorMessage += '.';
         res.send(errorMessage);
     } else {
-        bar.create({ name: req.body.name, description: req.body.description, location: req.body.location })
-            .then(bar => {
-                User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
-                    .then(res.redirect('bar'))
-            })
-            .catch(error => res.send(error))
-    }
+
+            bar.create({ name: req.body.name, description: req.body.description, location: req.body.location, photos: req.body.photos })
+                .then(bar => {
+                    User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
+                        .then(res.redirect('bar'))
+                })
+                .catch(error => res.send(error))
+        }
 });
 
 module.exports = router;
