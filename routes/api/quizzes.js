@@ -1,23 +1,24 @@
 "use strict";
 var express = require('express');
 var router = express.Router();
-var category = require('../../models/category').Category;
+var quiz = require('../../models/qui').Quiz;
 var question = require('../../models/question').Question;
 var Logger = require('../../models/logger');
-/* GET categories. */
+/* GET quizzes. */
 router.get('/', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    //  category.hasMany(question);
+    //  quiz.hasMany(question);
     require('../../db/foreignkeys').estabilishFKs();
-    category.findAll()
-        .then(function (categories) { return res.send(categories); })
+    quiz.findAll()
+        .then(function (quizzes) { return res.send(quizzes); })
         .catch(function (error) { return Logger(error); });
     //console.log(q);
-    //Logger.log('error', category.getQuestions());
+    //Logger.log('error', quiz.getQuestions());
 });
-/* POST categories */
+/* POST quizzes */
 router.post('/', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    category.create({ title: req.body.title, description: req.body.description });
+    quiz.create({ title: req.body.title, description: req.body.description })
+        .catch(function (error) { return Logger(error); });
 });
 module.exports = router;

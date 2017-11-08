@@ -1,26 +1,27 @@
 var express = require('express');
 var router = express.Router();
-var category = require('../../models/category').Category;
+var quiz = require('../../models/qui').Quiz;
 const question = require('../../models/question').Question;
 const Logger = require('../../models/logger');
 
-/* GET categories. */
+/* GET quizzes. */
 router.get('/', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-  //  category.hasMany(question);
+  //  quiz.hasMany(question);
     require('../../db/foreignkeys').estabilishFKs();
-    category.findAll()
-        .then(categories => res.send(categories))
+    quiz.findAll()
+        .then(quizzes => res.send(quizzes))
         .catch(error => Logger(error))
 
     //console.log(q);
-    //Logger.log('error', category.getQuestions());
+    //Logger.log('error', quiz.getQuestions());
 });
 
-/* POST categories */
+/* POST quizzes */
 router.post('/', function (req, res, next){
     res.header("Access-Control-Allow-Origin", "*");
-    category.create({ title: req.body.title ,description: req.body.description});
+    quiz.create({ title: req.body.title ,description: req.body.description})
+        .catch(error => Logger(error))
 })
 
 module.exports = router;
