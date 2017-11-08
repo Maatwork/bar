@@ -5,7 +5,7 @@ const Logger = require('../../models/logger');
 const user = require('../../models/user');
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
-    model: require('../../models/oauthmodel')
+    model: require('../../models/oAuthModel')
 });
 
 router.get('/', (req, res) => {
