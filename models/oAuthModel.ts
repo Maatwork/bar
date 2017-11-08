@@ -71,6 +71,7 @@ module.exports.saveToken = function (token, client, user) {
     });
 };
 
+
 module.exports.revokeToken = (token) => {
     return Token.destroy({where: {refresh_token: token.refreshToken}})
         .then(res => {
