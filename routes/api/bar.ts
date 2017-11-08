@@ -5,8 +5,9 @@ const Logger = require('../../models/logger');
 const user = require('../../models/user');
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
-    model: require('../../db/database')
+    model: require('../../models/oauthmodel')
 });
+
 router.get('/', (req, res) => {
    bar.findAll({raw: true}).then(bars => {
        res.send(bars);
@@ -31,13 +32,14 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         errorMessage += '.';
         res.send(errorMessage);
     } else {
-        bar.create({ name: req.body.name, description: req.body.description, location: req.body.location })
-            .then(bar => {
-                User.update({barId: bar.id}, {where: {id: req.user.id}})
-                    .then(res.redirect('bar'))
-            })
-            .catch(error => res.send(error.errors[0].message))
-    }
+
+            bar.create({ name: req.body.name, description: req.body.description, location: req.body.location, photos: JSON.parse(req.body.photos) })
+                .then(bar => {
+                    User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
+                        .then(res.redirect('bar'))
+                })
+                .catch(error => res.send(error))
+        }
 });
 
 module.exports = router;
