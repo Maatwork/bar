@@ -27,13 +27,15 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
     let errorMessage: String = '';
     if (!req.body.name) errorMessage += 'Please fill in your bar name';
     if (!req.body.description) errorMessage ? errorMessage += ', bar description' : errorMessage = 'Please fill in your bar description';
-    if (!req.body.location) errorMessage ? errorMessage += ' and address' : errorMessage = 'Please fill in your bar address';
+    if (!req.body.city) errorMessage ? errorMessage += ' , city' : errorMessage = 'Please fill in the city of your bar';
+    if (!req.body.zipcode) errorMessage ? errorMessage += ' , zipcode' : errorMessage = 'Please fill in your zipcode';
+    if (!req.body.address) errorMessage ? errorMessage += ' and address ' : errorMessage = 'Please fill in your address';
     if (errorMessage) {
         errorMessage += '.';
         res.send(errorMessage);
     } else {
 
-            bar.create({ name: req.body.name, description: req.body.description, location: req.body.location, photos: JSON.parse(req.body.photos) })
+            bar.create({ name: req.body.name, description: req.body.description, city: req.body.city, zipcode: req.body.zipcode, address: req.body.address, photos: JSON.parse(req.body.photos) })
                 .then(bar => {
                     User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
                         .then(res.redirect('bar'))
