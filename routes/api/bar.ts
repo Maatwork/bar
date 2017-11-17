@@ -12,7 +12,7 @@ const oauth = new OAuth2Server({
 
 router.get('/', (req, res) => {
     let condition = null;
-    if (req.query.city) condition = { city: req.query.city };
+    if (req.query.city) condition = { city: req.query.city.toLowerCase() };
    bar.findAll({where: condition, raw: true}).then(bars => {
        res.send(bars);
    })
