@@ -35,7 +35,7 @@ module.exports.getRequestLogger = expressWinston.logger({
         new winston.transports.Console({
             json: false,
             colorize: true,
-            level: "info"
+            level: "debug"
 
         }),
         new winston.transports.DailyRotateFile({

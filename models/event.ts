@@ -1,8 +1,5 @@
-const Logger = require('../models/logger');
-
 const db = require('../db/database').getDb;
 const types = require('sequelize').DataTypes;
-const bar = require('../models/bar').Bar;
 
 module.exports.Event  = db.define('event', {
     id: {
