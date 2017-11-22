@@ -20,12 +20,14 @@ var barLocal = require('./routes/bar');
 var playlists = require('./routes/api/playlists');
 var barApi = require('./routes/api/bar');
 require('./db/foreignkeys').estabilishFKs();
-//require('./db/database').getDb.sync({force: true});
+require('./db/database').getDb.sync();
 var User = require('./models/user').User;
 var Client = require('./models/client').Client;
 var app = express();
-//require('./db/foreignkeys').estabilishFKs();
-require('./db/database').getDb.sync();
+var noCORS = function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+};
 passport.use(new LocalStrategy(function (username, password, callback) {
     var bcrypt = require('bcryptjs');
     User.findOne({ where: { username: username } }, { raw: true }).
@@ -74,11 +76,12 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
-app.use('/api/playlists/', playlists);
 app.use('/api/categories/', categories);
 app.use('/api/questions/', questions);
-app.use('/api/bars/', barApi);
+app.use('/api/playlists/', noCORS, playlists);
+app.use('/api/bars/', noCORS, barApi);
 app.use('/bar/', barLocal);
+app.use('/oauth/me', me);
 //app.use('/users', users);
 app.get('/oauth/authorize', function (req, res) {
     if (req.user) {
@@ -96,8 +99,13 @@ app.get('/oauth/authorize', function (req, res) {
         res.redirect('/login');
     }
 });
-app.post("/oauth/authorize", app.oauth.authorize());
 app.post("/oauth/token", app.oauth.token());
+app.post("/oauth/authorize", noCORS, app.oauth.authorize());
+app.options("/oauth/token", noCORS, function (req, res) {
+    res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.send(200);
+});
+app.post("/oauth/token", noCORS, app.oauth.token());
 app.get('/login', function (req, res) {
     res.render('user/login', { msg: '', title: 'Login', username: '' });
 });
