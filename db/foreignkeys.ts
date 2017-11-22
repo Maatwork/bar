@@ -12,19 +12,15 @@ module.exports.estabilishFKs = () => {
     bar.hasMany(event);
     authorizationCode.belongsTo(user);
     authorizationCode.belongsTo(client);
-    bar.hasOne(user);
+    user.belongsTo(bar);
     client.belongsTo(user);
     token.belongsTo(user);
     token.belongsTo(client);
     question.belongsTo(category);
-
-
-
-   //  require('../models/user').User.findOne({where: {id: ''}}, {raw: true})
-   //      .then(user => {
-   //          console.log('ok.. usr is:' + user);
-   //          console.log(user);
-   //      }).catch(err => {
-   //          console.log('super rrar' + err);
-   //  })
 };
+
+module.exports.Bar = bar;
+module.exports.Client = client;
+module.exports.Event = event;
+module.exports.Token = token;
+module.exports.User = user;

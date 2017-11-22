@@ -14,9 +14,15 @@ module.exports.Bar  = db.define('bar', {
         type: types.TEXT
     },
     photos: {
-        type: types.ARRAY(types.TEXT)
+        type: types.JSON
     },
-    location: {
+    city: {
         type: types.TEXT
-}
+    },
+    zipcode: {
+        type: types.TEXT
+    },
+    address: {
+        type: types.TEXT
+    }
 });

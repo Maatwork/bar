@@ -21,20 +21,20 @@ const categories = require('./routes/api/categories');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
+const me = require('./routes/oauth/me');
 
 
 require('./db/foreignkeys').estabilishFKs();
-//require('./db/database').getDb.sync({force: true});
+require('./db/database').getDb.sync();
 
 const User = require('./models/user').User;
 const Client = require('./models/client').Client;
 const app = express();
 
-
-//require('./db/foreignkeys').estabilishFKs();
-require('./db/database').getDb.sync();
-
-
+let noCORS = function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    next()
+}
 
 passport.use(new LocalStrategy((username: String, password: String, callback: Function) => {
         let bcrypt = require('bcryptjs');
@@ -89,11 +89,13 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
-app.use('/api/playlists/', playlists);
 app.use('/api/categories/', categories);
 app.use('/api/questions/', questions);
-app.use('/api/bars/', barApi);
+app.use('/api/playlists/', noCORS, playlists);
+app.use('/api/bars/', noCORS, barApi);
 app.use('/bar/', barLocal);
+app.use('/oauth/me', me);
+
 //app.use('/users', users);
 app.get('/oauth/authorize', (req, res) => {
     if (req.user) {
@@ -111,8 +113,13 @@ app.get('/oauth/authorize', (req, res) => {
 });
 
 
-app.post("/oauth/authorize", app.oauth.authorize());
 app.post("/oauth/token", app.oauth.token());
+app.post("/oauth/authorize", noCORS, app.oauth.authorize());
+app.options("/oauth/token", noCORS, (req, res) => {
+    res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.send(200);
+});
+app.post("/oauth/token", noCORS, app.oauth.token());
 
 app.get('/login', (req, res) => {
         res.render('user/login', { msg: '', title: 'Login', username: '' });
