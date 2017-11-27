@@ -32,7 +32,10 @@ const app = express();
 
 let noCORS = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
+    console.log(JSON.stringify(req.header));
     res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.header('Access-Control-Allow-Methods', req.header('Access-Control-Request-Method'));
+
     next()
 };
 
