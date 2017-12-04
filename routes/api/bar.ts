@@ -1,3 +1,5 @@
+import {where} from "sequelize";
+
 const express = require('express');
 const router = express.Router();
 const bar = require('../../models/bar').Bar;
@@ -9,7 +11,9 @@ const oauth = new OAuth2Server({
 });
 
 router.get('/', (req, res) => {
-   bar.findAll({raw: true}).then(bars => {
+    let condition = null;
+    if (req.query.city) condition = { city: req.query.city.toLowerCase() };
+   bar.findAll({where: condition, raw: true}).then(bars => {
        res.send(bars);
    })
 });
@@ -20,6 +24,14 @@ router.get('/:barId', (req, res) => {
     bar.findOne({where: {id: req.params.barId}})
         .then(bar => res.send(bar))
         .catch(err => Logger.log('error', err))
+});
+
+router.get('/:city', (req, res) => {
+    if (!req.params.city) return res.sendStatus(400);
+
+    bar.findAll({where: {city: req.params.city}})
+        .then(bars => {res.send(bars);
+    })
 });
 
 /* POST bar. */
