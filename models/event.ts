@@ -1,15 +1,12 @@
-const Logger = require('../models/logger');
-
 const db = require('../db/database').getDb;
 const types = require('sequelize').DataTypes;
-const bar = require('../models/bar').Bar;
 
 module.exports.Event  = db.define('event', {
     id: {
         type: types.UUID, allowNull: false, unique: true, primaryKey: true, defaultValue: db.fn('uuid_generate_v4')
     },
     name: {
-        type: types.TEXT, allowNull: false
+        type: types.TEXT, allowNull: false, validate: {notEmpty: true}
     },
     description: {
         type: types.TEXT
