@@ -17,7 +17,7 @@ const index = require('./routes/index');
 const register = require('./routes/register');
 const clients = require('./routes/clients');
 const questions = require('./routes/api/questions');
-const categories = require('./routes/api/categories');
+const quizzes = require('./routes/api/quizzes');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
@@ -35,6 +35,12 @@ let noCORS = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     next()
 }
+
+
+//require('./db/foreignkeys').estabilishFKs();
+require('./db/database').getDb.sync();
+
+
 
 passport.use(new LocalStrategy((username: String, password: String, callback: Function) => {
         let bcrypt = require('bcryptjs');
@@ -89,8 +95,8 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
-app.use('/api/categories/', categories);
-app.use('/api/questions/', questions);
+app.use('/api/quizzes/', noCORS, quizzes);
+app.use('/api/questions/', noCORS, questions);
 app.use('/api/playlists/', noCORS, playlists);
 app.use('/api/bars/', noCORS, barApi);
 app.use('/bar/', barLocal);

@@ -5,7 +5,7 @@ const authorizationCode = require('../models/authorizationCode').AuthorizationCo
 const token = require('../models/token').Token;
 const user = require('../models/user').User;
 const db = require('../db/database').getDb;
-const category = require('../models/category').Category;
+const quiz = require('../models/quiz').Quiz;
 const question = require('../models/question').Question;
 
 module.exports.estabilishFKs = () => {
@@ -16,7 +16,7 @@ module.exports.estabilishFKs = () => {
     client.belongsTo(user);
     token.belongsTo(user);
     token.belongsTo(client);
-    question.belongsTo(category);
+    question.belongsTo(quiz);
 };
 
 module.exports.Bar = bar;

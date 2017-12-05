@@ -8,6 +8,18 @@ module.exports.Question = db.define('question', {
         },
         text: {
             type: types.TEXT, allowNull: false
+        },
+        media: {
+            type: types.TEXT
+        },
+        category: {
+            type: types.ARRAY(types.TEXT)
+        },
+        answer: {
+            type: types.TEXT
+        },
+        duration: {
+            type: types.INTEGER
         }
     }
 );
