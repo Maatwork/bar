@@ -59,14 +59,15 @@ router.patch('/:barId', oauth.authenticate({scope: "bar"}), function (req, res) 
     if (!req.params.barId) return res.sendStatus(401).send('Please fill in a bar ID');
     user.findOne({where: {id: res.locals.oauth.token.user.id}})
         .then(owner => {
-            if (owner.barId != req.params.barId) return res.status(401).send('bar not connected');
-            return bar.findOne({where: {id: barId}});
+            if (owner.barId != req.params.barId) return Promise.reject('Not the bar owner.');
+            return bar.findOne({where: {id: owner.barId}});
         })
         .then(myBar => {
             delete(req.body.userId);
-            return res.send(myBar.update(req.body));
+            return myBar.update(req.body);
         })
-        .catch(err => res.sendStatus(400).send(err));
+        .then(resultBar => (res.send(resultBar)))
+        .catch(err => console.log(err));
 });
 
 module.exports = router;
