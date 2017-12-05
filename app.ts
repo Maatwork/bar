@@ -96,7 +96,7 @@ app.use('/api/playlists/', noCORS, playlists);
 app.use('/api/bars/', noCORS, barApi);
 app.use('/api/events', noCORS, events);
 app.use('/bar/', barLocal);
-app.use('/oauth/me', me);
+app.use('/oauth/me', noCORS, me);
 
 //app.use('/users', users);
 app.get('/oauth/authorize', (req, res) => {
