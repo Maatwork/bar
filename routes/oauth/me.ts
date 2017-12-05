@@ -9,7 +9,6 @@ const oauth = new OAuth2Server({
 });
 
 router.get('/', oauth.authenticate({scope:"Jukebox"}),  (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*'); // todo:: change this to music.maatwerk.works later, tommyboy
     User.findOne({attributes: {exclude: 'password'}, raw: true, include: Bar, where: { id: res.locals.oauth.token.user.id }}).then(result => {
         res.send(result);
     })
