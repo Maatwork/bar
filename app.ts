@@ -19,10 +19,12 @@ const clients = require('./routes/clients');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
+const events = require('./routes/api/event');
 const me = require('./routes/oauth/me');
 
 require('./db/foreignkeys').estabilishFKs();
-require('./db/database').getDb.sync();
+//require('./db/database').getDb.sync();
+//require('./db/database').Event.sync({alter: true});
 
 const User = require('./models/user').User;
 const Client = require('./models/client').Client;
@@ -30,8 +32,12 @@ const app = express();
 
 let noCORS = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
+    console.log(JSON.stringify(req.header));
+    res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.header('Access-Control-Allow-Methods', req.header('Access-Control-Request-Method'));
+
     next()
-}
+};
 
 passport.use(new LocalStrategy((username: String, password: String, callback: Function) => {
         let bcrypt = require('bcryptjs');
@@ -88,6 +94,7 @@ app.use('/register', register);
 app.use('/clients/', clients);
 app.use('/api/playlists/', noCORS, playlists);
 app.use('/api/bars/', noCORS, barApi);
+app.use('/api/events', noCORS, events);
 app.use('/bar/', barLocal);
 app.use('/oauth/me', me);
 

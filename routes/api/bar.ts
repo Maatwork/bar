@@ -2,7 +2,8 @@ import {where} from "sequelize";
 
 const express = require('express');
 const router = express.Router();
-const bar = require('../../models/bar').Bar;
+const bar = require('../../db/foreignkeys').Bar;
+const event = require('../../db/foreignkeys').Event;
 const Logger = require('../../models/logger');
 const user = require('../../models/user');
 const OAuth2Server = require('express-oauth-server');
@@ -21,7 +22,7 @@ router.get('/', (req, res) => {
 router.get('/:barId', (req, res) => {
     if (!req.params.barId) return res.sendStatus(400);
 
-    bar.findOne({where: {id: req.params.barId}})
+    bar.findOne({where: {id: req.params.barId}, include: event})
         .then(bar => res.send(bar))
         .catch(err => Logger.log('error', err))
 });
