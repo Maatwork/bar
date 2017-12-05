@@ -4,7 +4,6 @@ const user = require('../../db/foreignkeys').User;
 const bar = require('../../db/foreignkeys').Bar;
 const event = require('../../db/foreignkeys').Event;
 const Logger = require('../../models/logger');
-const user = require('../../models/user');
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
     model: require('../../models/oAuthModel')
