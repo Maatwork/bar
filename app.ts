@@ -21,11 +21,13 @@ const quizzes = require('./routes/api/quizzes');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
+const events = require('./routes/api/event');
 const me = require('./routes/oauth/me');
 
 
 require('./db/foreignkeys').estabilishFKs();
-require('./db/database').getDb.sync();
+//require('./db/database').getDb.sync();
+//require('./db/database').Event.sync({alter: true});
 
 const User = require('./models/user').User;
 const Client = require('./models/client').Client;
@@ -33,8 +35,12 @@ const app = express();
 
 let noCORS = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
+    console.log(JSON.stringify(req.header));
+    res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.header('Access-Control-Allow-Methods', req.header('Access-Control-Request-Method'));
+
     next()
-}
+};
 
 
 //require('./db/foreignkeys').estabilishFKs();
@@ -99,8 +105,9 @@ app.use('/api/quizzes/', noCORS, quizzes);
 app.use('/api/questions/', noCORS, questions);
 app.use('/api/playlists/', noCORS, playlists);
 app.use('/api/bars/', noCORS, barApi);
+app.use('/api/events', noCORS, events);
 app.use('/bar/', barLocal);
-app.use('/oauth/me', me);
+app.use('/oauth/me', noCORS, me);
 
 //app.use('/users', users);
 app.get('/oauth/authorize', (req, res) => {

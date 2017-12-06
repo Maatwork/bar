@@ -17,7 +17,9 @@ module.exports.estabilishFKs = () => {
     token.belongsTo(user);
     token.belongsTo(client);
     question.belongsTo(quiz);
-};
+    bar.hasMany(event);
+    event.belongsTo(bar);
+     };
 
 module.exports.Bar = bar;
 module.exports.Client = client;

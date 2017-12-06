@@ -1,15 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const bar = require('../../models/bar').Bar;
+const user = require('../../db/foreignkeys').User;
+const bar = require('../../db/foreignkeys').Bar;
+const event = require('../../db/foreignkeys').Event;
 const Logger = require('../../models/logger');
-const user = require('../../models/user');
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
     model: require('../../models/oAuthModel')
 });
 
 router.get('/', (req, res) => {
-   bar.findAll({raw: true}).then(bars => {
+    let condition = {};
+    if (req.query.userId) condition.userId = req.query.userId;
+    bar.findAll({raw: true, where: condition}).then(bars => {
        res.send(bars);
    })
 });
@@ -17,7 +20,7 @@ router.get('/', (req, res) => {
 router.get('/:barId', (req, res) => {
     if (!req.params.barId) return res.sendStatus(400);
 
-    bar.findOne({where: {id: req.params.barId}})
+    bar.findOne({where: {id: req.params.barId}, include: event})
         .then(bar => res.send(bar))
         .catch(err => Logger.log('error', err))
 });
@@ -35,13 +38,36 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         res.send(errorMessage);
     } else {
 
-            bar.create({ name: req.body.name, description: req.body.description, city: req.body.city, zipcode: req.body.zipcode, address: req.body.address, photos: JSON.parse(req.body.photos) })
-                .then(bar => {
-                    User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
-                        .then(res.redirect('bar'))
-                })
-                .catch(error => res.send(error))
-        }
+        bar.create({
+            name: req.body.name,
+            description: req.body.description,
+            city: req.body.city,
+            zipcode: req.body.zipcode,
+            address: req.body.address,
+            photos: JSON.parse(req.body.photos)
+        })
+            .then(bar => {
+                User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
+                    .then(res.redirect('bar'))
+            })
+            .catch(error => res.send(error))
+    }
+});
+
+/* PATCH bar. */
+router.patch('/:barId', oauth.authenticate({scope: "bar"}), function (req, res) {
+    if (!req.params.barId) return res.sendStatus(401).send('Please fill in a bar ID');
+    user.findOne({where: {id: res.locals.oauth.token.user.id}})
+        .then(owner => {
+            if (owner.barId != req.params.barId) return Promise.reject('Not the bar owner.');
+            return bar.findOne({where: {id: owner.barId}});
+        })
+        .then(myBar => {
+            delete(req.body.userId);
+            return myBar.update(req.body);
+        })
+        .then(resultBar => (res.send(resultBar)))
+        .catch(err => console.log(err));
 });
 
 module.exports = router;
