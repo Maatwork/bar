@@ -16,11 +16,14 @@ const Logger = require('./models/logger');
 const index = require('./routes/index');
 const register = require('./routes/register');
 const clients = require('./routes/clients');
+const questions = require('./routes/api/questions');
+const quizzes = require('./routes/api/quizzes');
 const barLocal = require('./routes/bar');
 const playlists = require('./routes/api/playlists');
 const barApi = require('./routes/api/bar');
 const events = require('./routes/api/event');
 const me = require('./routes/oauth/me');
+
 
 require('./db/foreignkeys').estabilishFKs();
 //require('./db/database').getDb.sync();
@@ -38,6 +41,12 @@ let noCORS = function (req, res, next) {
 
     next()
 };
+
+
+//require('./db/foreignkeys').estabilishFKs();
+require('./db/database').getDb.sync();
+
+
 
 passport.use(new LocalStrategy((username: String, password: String, callback: Function) => {
         let bcrypt = require('bcryptjs');
@@ -92,6 +101,8 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
+app.use('/api/quizzes/', noCORS, quizzes);
+app.use('/api/questions/', noCORS, questions);
 app.use('/api/playlists/', noCORS, playlists);
 app.use('/api/bars/', noCORS, barApi);
 app.use('/api/events', noCORS, events);
@@ -114,6 +125,8 @@ app.get('/oauth/authorize', (req, res) => {
     }
 });
 
+
+app.post("/oauth/token", app.oauth.token());
 app.post("/oauth/authorize", noCORS, app.oauth.authorize());
 app.options("/oauth/token", noCORS, (req, res) => {
     res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
