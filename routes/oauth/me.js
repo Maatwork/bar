@@ -8,10 +8,10 @@ var OAuth2Server = require('express-oauth-server');
 var oauth = new OAuth2Server({
     model: require('../../models/oAuthModel')
 });
-router.get('/', oauth.authenticate({ scope: "Jukebox" }), function (req, res) {
-    res.header('Access-Control-Allow-Origin', '*'); // todo:: change this to music.maatwerk.works later, tommyboy
+router.get('/', oauth.authenticate(), function (req, res) {
     User.findOne({ attributes: { exclude: 'password' }, raw: true, include: Bar, where: { id: res.locals.oauth.token.user.id } }).then(function (result) {
         res.send(result);
     });
 });
 module.exports = router;
+//# sourceMappingURL=me.js.map

@@ -2,6 +2,7 @@ import {where} from "sequelize";
 
 const express = require('express');
 const router = express.Router();
+const user = require('../../db/foreignkeys').User;
 const bar = require('../../db/foreignkeys').Bar;
 const event = require('../../db/foreignkeys').Event;
 const Logger = require('../../models/logger');
@@ -11,10 +12,11 @@ const oauth = new OAuth2Server({
 });
 
 router.get('/', (req, res) => {
-    let condition = null;
-    if (req.query.city) condition = { city: req.query.city.toLowerCase() };
-   bar.findAll({where: condition, raw: true}).then(bars => {
-       res.send(bars);
+    let condition = {};
+    if (req.query.city) condition.city = req.query.city;
+	if (req.query.userId) condition.userId = req.query.userId;
+		bar.findAll({where: condition, raw: true}).then(bars => {
+		res.send(bars);
    })
 });
 
