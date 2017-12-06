@@ -64,6 +64,7 @@ user.data.ignore
 routes/*.js
 app.js
 models/*.js
+node_modules/@types/node
 config
 /user.data.ignore
 workspace.xml
