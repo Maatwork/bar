@@ -28,6 +28,8 @@
     <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSStartBrowserRunConfigurationExtension">
       <browser with-js-debugger="true" url="http://localhost:3000/" />
     </EXTENSION>
-    <method />
+    <method>
+      <option name="TypeScript.Before.Run" enabled="true" FAIL_ON_ERROR="false" CONFIG_PATH="$PROJECT_DIR$/tsconfig.json" />
+    </method>
   </configuration>
 </component>

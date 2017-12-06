@@ -15,19 +15,26 @@ var index = require('./routes/index');
 var register = require('./routes/register');
 var clients = require('./routes/clients');
 var questions = require('./routes/api/questions');
-var categories = require('./routes/api/categories');
+var quizzes = require('./routes/api/quizzes');
 var barLocal = require('./routes/bar');
-var playlists = require('./routes/api/playlists');
 var barApi = require('./routes/api/bar');
+var events = require('./routes/api/event');
+var me = require('./routes/oauth/me');
 require('./db/foreignkeys').estabilishFKs();
-require('./db/database').getDb.sync();
+//require('./db/database').getDb.sync();
+//require('./db/database').Event.sync({alter: true});
 var User = require('./models/user').User;
 var Client = require('./models/client').Client;
 var app = express();
 var noCORS = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
+    console.log(JSON.stringify(req.header));
+    res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+    res.header('Access-Control-Allow-Methods', req.header('Access-Control-Request-Method'));
     next();
 };
+//require('./db/foreignkeys').estabilishFKs();
+require('./db/database').getDb.sync();
 passport.use(new LocalStrategy(function (username, password, callback) {
     var bcrypt = require('bcryptjs');
     User.findOne({ where: { username: username } }, { raw: true }).
@@ -76,12 +83,12 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/register', register);
 app.use('/clients/', clients);
-app.use('/api/categories/', categories);
-app.use('/api/questions/', questions);
-app.use('/api/playlists/', noCORS, playlists);
+app.use('/api/quizzes/', noCORS, quizzes);
+app.use('/api/questions/', noCORS, questions);
 app.use('/api/bars/', noCORS, barApi);
+app.use('/api/events', noCORS, events);
 app.use('/bar/', barLocal);
-app.use('/oauth/me', me);
+app.use('/oauth/me', noCORS, me);
 //app.use('/users', users);
 app.get('/oauth/authorize', function (req, res) {
     if (req.user) {
@@ -145,3 +152,4 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 module.exports = app;
+//# sourceMappingURL=app.js.map

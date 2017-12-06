@@ -1,10 +1,7 @@
 const express = require('express');
 const formidable = require('express-formidable');
 const router = express.Router();
-const storage = require('filestorage').create('C:\\uploads-');
-const httpStatus = require('http-status-codes');
 const quiz = require('../../models/quiz').Quiz;
-const question = require('../../models/question').Question;
 const Logger = require('../../models/logger');
 
 /* GET quizzes. */
@@ -28,10 +25,10 @@ router.post('/', formidable(), (req, res, next) => {
         image: req.fields.image
     }).then((quiz) => {
         console.log(quiz);
-        res.status(httpStatus.CREATED).send(quiz);
+        res.status(201).send(quiz);
     }).catch((error) => {
         console.log(error);
-        res.status(httpStatus.BAD_REQUEST).send(error);
+        res.status(400).send(error);
     })
     /*
      if (req.files["image"]) {
@@ -59,7 +56,7 @@ router.put('/:quizId', formidable(), (req, res, next) => {
                     category: req.fields.category
                 }).catch((error) => {
                     console.log(error);
-                    res.status(httpStatus.BAD_REQUEST).send(error);
+                    res.status(401).send(error);
                 })
             }
     })

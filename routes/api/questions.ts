@@ -3,7 +3,6 @@ const router = express.Router();
 const formidable = require('express-formidable');
 const question = require('../../models/question').Question;
 const Logger = require('../../models/logger');
-const httpStatus = require('http-status-codes');
 
 /* GET questions. */
 router.get('/', function(req, res, next) {
@@ -34,7 +33,7 @@ router.post('/:quizId', formidable(), (req, res, next) => {
                 duration: req.fields.answer,
                 quizId: req.fields.quizId
             }).then((quiz) => {
-                        res.status(httpStatus.CREATED).send(quiz);
+                        res.status(201).send(quiz);
             }).catch(error => Logger.log(error));
         })
     }
@@ -46,10 +45,10 @@ router.post('/:quizId', formidable(), (req, res, next) => {
         duration: req.fields.duration,
         quizId: req.fields.quizId
     }).then((question) => {
-        res.status(httpStatus.CREATED).send(question);
+        res.status(201).send(question);
     }).catch((error) => {
         console.log(error)
-        res.status(httpStatus.BAD_REQUEST).send(error);
+        res.status(400).send(error);
     })
 });
 
@@ -64,7 +63,7 @@ router.put('/:questionId', formidable(), (req, res, next) => {
                     duration: req.fields.duration
                 }).catch((error) => {
                     console.log(error);
-                    res.status(httpStatus.BAD_REQUEST).send(error);
+                    res.status(201).send(error);
                 })
             }
         })
