@@ -10,7 +10,8 @@ module.exports.estabilishFKs = () => {
     bar.hasMany(event);
     authorizationCode.belongsTo(user);
     authorizationCode.belongsTo(client);
-    user.belongsTo(bar);
+    user.hasMany(bar);
+    bar.belongsTo(user);
     client.belongsTo(user);
     token.belongsTo(user);
     token.belongsTo(client);

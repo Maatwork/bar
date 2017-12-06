@@ -4,8 +4,8 @@ const express = require('express');
 const router = express.Router();
 const bar = require('../../db/foreignkeys').Bar;
 const event = require('../../db/foreignkeys').Event;
+const user = require('../../db/foreignkeys').User;
 const Logger = require('../../models/logger');
-const user = require('../../models/user');
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
     model: require('../../models/oAuthModel')
@@ -48,13 +48,28 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         res.send(errorMessage);
     } else {
 
-            bar.create({ name: req.body.name, description: req.body.description, city: req.body.city, zipcode: req.body.zipcode, address: req.body.address, photos: JSON.parse(req.body.photos) })
-                .then(bar => {
-                    User.update({barId: bar.id}, {where: {id: res.locals.oauth.token.user.id}})
-                        .then(res.redirect('bar'))
-                })
+            bar.create({ name: req.body.name, description: req.body.description, city: req.body.city, zipcode: req.body.zipcode, address: req.body.address, photos: JSON.parse(req.body.photos), userId: res.locals.oauth.token.user.id })
+                .then(res.redirect('bar'))
                 .catch(error => res.send(error))
         }
+});
+
+/* PATCH bar. */
+router.patch('/:barId', oauth.authenticate({scope: "bar"}), function (req, res) {
+    if (!req.params.barId) return res.sendStatus(401).send('Please fill in a bar ID');
+
+    bar.findOne({where: {id: req.params.barId}})
+        .then(bar => {
+            if (bar.userId != res.locals.oauth.token.user.id) return Promise.reject('Not the bar owner.');
+            return bar;
+        })
+        .then(myBar => {
+            delete(req.body.userId);
+            req.body.photos = JSON.parse(req.body.photos);
+            return myBar.update(req.body);
+        })
+        .then(resultBar => (res.send(resultBar)))
+        .catch(err => console.log(err));
 });
 
 module.exports = router;

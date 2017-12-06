@@ -23,7 +23,7 @@ const events = require('./routes/api/event');
 const me = require('./routes/oauth/me');
 
 require('./db/foreignkeys').estabilishFKs();
-//require('./db/database').getDb.sync();
+//require('./db/database').getDb.sync({alter: true});
 //require('./db/database').Event.sync({alter: true});
 
 const User = require('./models/user').User;
