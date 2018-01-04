@@ -24,7 +24,6 @@ artifacts:
   files:
     - appspec.yml
     - bin/**/*
-    - models/**/*
     - node_modules/**/*
     - public/**/*
     - routes/**/*

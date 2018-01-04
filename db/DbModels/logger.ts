@@ -4,17 +4,17 @@ require('winston-daily-rotate-file');
 require('winston-telegram').Telegram;
 
 winston.add(winston.transports.Telegram, {
-    token : '471142868:AAEh8kpcUsZXQR2mfwjKNmKxvtUUZ3JOVk4',
-    chatId : '-212841224',
-    level : 'error',
-    unique : true
+    token: '471142868:AAEh8kpcUsZXQR2mfwjKNmKxvtUUZ3JOVk4',
+    chatId: '-212841224',
+    level: 'error',
+    unique: true
 });
 winston.add(winston.transports.Telegram, {
     name: 'info logger',
-    token : '471142868:AAEh8kpcUsZXQR2mfwjKNmKxvtUUZ3JOVk4',
-    chatId : '-212841224',
-    level : 'info',
-    unique : true,
+    token: '471142868:AAEh8kpcUsZXQR2mfwjKNmKxvtUUZ3JOVk4',
+    chatId: '-212841224',
+    level: 'info',
+    unique: true,
     disableNotification: true
 });
 

@@ -1,55 +1,55 @@
-const Client = require('../models/client').Client;
-const Token = require('../models/token').Token;
-const User = require('../models/user').User;
-const AuthorizationCode = require('../models/authorizationCode').AuthorizationCode;
+const Client = require('./client').Client;
+const Token = require('./token').Token;
+const User = require('./user').User;
+const AuthorizationCode = require('./authorizationCode').AuthorizationCode;
 
-const Logger = require('../models/logger');
+const Logger = require('./logger');
 const bcrypt = require('bcryptjs');
 
 
 module.exports.getClient = (clientId: String, clientSecret: String) => {
     let condition: any;
-    if (clientSecret)  condition = { id: clientId, client_secret: clientSecret };
-    else condition = { id: clientId};
+    if (clientSecret) condition = {id: clientId, client_secret: clientSecret};
+    else condition = {id: clientId};
     return Client.findOne({where: condition})
         .then((client: any) => {
-        return {
-            id: client.id,
-            redirectUris: client.redirect_url,
-            grants: client.grants,
-            scope: client.scopes,
-            userId: client.userId
-        };
+            return {
+                id: client.id,
+                redirectUris: client.redirect_url,
+                grants: client.grants,
+                scope: client.scopes,
+                userId: client.userId
+            };
         });
 };
 
-module.exports.getAccessToken = function(bearerToken) {
+module.exports.getAccessToken = function (bearerToken) {
     return Token.findOne({
         attributes: ['access_token', 'access_token_expires_on', 'clientId', 'userId', 'scope'],
-        where: { access_token: bearerToken }
+        where: {access_token: bearerToken}
     }).then((token: any) => {
-       return {
-           accessToken: token.access_token,
-           client: {id: token.clientId},
-           accessTokenExpiresAt: new Date(token.access_token_expires_on + "+0000"),
-           user: {id: token.userId},
-           scope: token.scope
-       };
+        return {
+            accessToken: token.access_token,
+            client: {id: token.clientId},
+            accessTokenExpiresAt: new Date(token.access_token_expires_on + "+0000"),
+            user: {id: token.userId},
+            scope: token.scope
+        };
     });
 };
 
 module.exports.getRefreshToken = function (bearerToken) {
     return Token.findOne({
         attributes: ['refresh_token', 'refresh_token_expires_on', 'clientId', 'userId', 'scope'],
-        where: { refresh_token: bearerToken }
+        where: {refresh_token: bearerToken}
     }).then((token: any) => {
-    return {
-        refreshToken: token.refresh_token,
-        client: {id: token.clientId},
-        refreshTokenExpiresAt: new Date(token.refresh_token_expires_on + "+0000"),
-        user: {id: token.userId},
-        scope: token.scope
-    }
+        return {
+            refreshToken: token.refresh_token,
+            client: {id: token.clientId},
+            refreshTokenExpiresAt: new Date(token.refresh_token_expires_on + "+0000"),
+            user: {id: token.userId},
+            scope: token.scope
+        }
     });
 };
 
@@ -83,7 +83,7 @@ module.exports.revokeToken = (token) => {
 };
 
 module.exports.verifyScope = (token, scope) => {
-   if (!token.scope) {
+    if (!token.scope) {
         return false;
     }
     const authorizedScopes = token.scope.split(' ');
@@ -96,15 +96,17 @@ module.exports.validateScope = (user, client, scope) => {
 };
 
 module.exports.getUser = (username, password) => {
-    return User.findOne({where: {
-        username: username,
-    }}, { raw: true}).then(user => {
+    return User.findOne({
+        where: {
+            username: username,
+        }
+    }, {raw: true}).then(user => {
         return bcrypt.compare(password, user.password)
             .then(res => {
                 if (res) return user;
                 else return false;
             })
-    }).catch ((err) => {
+    }).catch((err) => {
         return Logger.log('error', err)
     });
 };
@@ -117,17 +119,19 @@ module.exports.getUserFromClient = (client) => {
 };
 
 module.exports.saveAuthorizationCode = (code, client, user) => {
-    return AuthorizationCode.create({authorization_code: code.authorizationCode, expires_on: code.expiresAt,
-            redirect_url: code.redirectUri, scope: code.scope, clientId: client.id, userId: user.id},
+    return AuthorizationCode.create({
+            authorization_code: code.authorizationCode, expires_on: code.expiresAt,
+            redirect_url: code.redirectUri, scope: code.scope, clientId: client.id, userId: user.id
+        },
         {raw: true}).then(newCode => {
-            return {
-                authorizationCode: newCode.authorization_code,
-                expiresAt: newCode.expires_on,
-                redirectUri: newCode.redirect_url,
-                scope: newCode.scope,
-                client: {id: newCode.clientId},
-                user: {id: newCode.userId}
-            }
+        return {
+            authorizationCode: newCode.authorization_code,
+            expiresAt: newCode.expires_on,
+            redirectUri: newCode.redirect_url,
+            scope: newCode.scope,
+            client: {id: newCode.clientId},
+            user: {id: newCode.userId}
+        }
     });
 };
 
@@ -152,7 +156,7 @@ module.exports.revokeAuthorizationCode = (code) => {
             return res
         })
         .catch((err) => {
-        return Logger.log('error', err)
-    });
+            return Logger.log('error', err)
+        });
 };
 

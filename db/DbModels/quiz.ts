@@ -1,5 +1,5 @@
-const Logger = require('../models/logger');
-const db = require('../db/database').getDb;
+const Logger = require('./logger');
+const db = require('../database').getDb;
 const types = require('sequelize').DataTypes;
 
 module.exports.Quiz = db.define('quiz', {

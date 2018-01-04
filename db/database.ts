@@ -1,4 +1,4 @@
-const Logger = require('../models/logger');
+const Logger = require('./DbModels/logger');
 
 const config    = require('../config/config.json');
 const Sequelize = require('sequelize');

@@ -6,7 +6,7 @@ var OAuthServer = require('express-oauth-server');
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-  res.render('index', { title: 'Express' });
+    res.render('index', {title: 'Maatwerk werkt niet'});
 });
 
 module.exports = router;

@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const user = require('../../db/foreignkeys').User;
-const bar = require('../../db/foreignkeys').Bar;
-const event = require('../../db/foreignkeys').Event;
-const Logger = require('../../models/logger');
+const user = require('../../db/models').User;
+const bar = require('../../db/models').Bar;
+const event = require('../../db/models').Event;
+const Logger = require('../../db/models').Logger;
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
-    model: require('../../models/oAuthModel')
+    model: require('../../db/models').OAuthModel
 });
 
 router.get('/', (req, res) => {

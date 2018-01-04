@@ -1,7 +1,7 @@
-const db = require('../db/database').getDb;
+const db = require('../database').getDb;
 const types = require('sequelize').DataTypes;
 
-module.exports.Event  = db.define('event', {
+module.exports.Event = db.define('event', {
     id: {
         type: types.UUID, allowNull: false, unique: true, primaryKey: true, defaultValue: db.fn('uuid_generate_v4')
     },

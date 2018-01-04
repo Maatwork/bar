@@ -1,8 +1,8 @@
 const express = require('express');
 const formidable = require('express-formidable');
 const router = express.Router();
-const quiz = require('../../models/quiz').Quiz;
-const Logger = require('../../models/logger');
+const quiz = require('../../db/models').Quiz;
+const Logger = require('../../db/models').Question;
 
 /* GET quizzes. */
 router.get('/', (req, res, next) => {

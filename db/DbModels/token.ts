@@ -1,4 +1,4 @@
-const db = require('../db/database').getDb;
+const db = require('../database').getDb;
 const types = require('sequelize').DataTypes;
 
 module.exports.Token = db.define('token', {

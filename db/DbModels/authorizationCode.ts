@@ -1,4 +1,4 @@
-const db = require('../db/database').getDb;
+const db = require('../database').getDb;
 const types = require('sequelize').DataTypes;
 
 module.exports.AuthorizationCode = db.define('authorization_code', {
@@ -12,14 +12,14 @@ module.exports.AuthorizationCode = db.define('authorization_code', {
         type: types.DATE, allowNull: false
     },
     redirect_url: {
-        type: types.TEXT, validate: { isURL: true }
+        type: types.TEXT, validate: {isURL: true}
     },
     scope: {
-    type: types.TEXT
-}
+        type: types.TEXT
+    }
 }, {
     indexes: [{
-            method: 'BTREE',
-            fields: ['authorization_code']
-        }]
+        method: 'BTREE',
+        fields: ['authorization_code']
+    }]
 });

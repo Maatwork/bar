@@ -1,4 +1,4 @@
-const db = require('../db/database').getDb;
+const db = require('../database').getDb;
 const types = require('sequelize').DataTypes;
 
 module.exports.Client = db.define('client',
@@ -11,10 +11,11 @@ module.exports.Client = db.define('client',
         },
         redirect_url: {
             type: types.TEXT, allowNull: false,
-            validate: { isURL: true }
+            validate: {isURL: true}
         },
         grants: {
-            type: types.ARRAY(types.TEXT), defaultValue: ['authorization_code', 'client_credentials', 'refresh_token', 'password']
+            type: types.ARRAY(types.TEXT),
+            defaultValue: ['authorization_code', 'client_credentials', 'refresh_token', 'password']
         },
         scopes: {
             type: types.ARRAY(types.TEXT), defaultValue: ['bar']

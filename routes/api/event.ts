@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const event = require('../../db/foreignkeys').Event;
-const bar = require('../../db/foreignkeys').Bar;
-const user = require('../../db/foreignkeys').User;
+const event = require('../../db/models').Event;
+const bar = require('../../db/models').Bar;
+const user = require('../../db/models').User;
 const Op = require('sequelize').Op;
-const Logger = require('../../models/logger');
+const Logger = require('../../db/models').Logger;
 const OAuth2Server = require('express-oauth-server');
 const oauth = new OAuth2Server({
-    model: require('../../models/oAuthModel')
+    model: require('../../db/models').OAuthModel
 });
 
 router.get('/', (req, res) => {
@@ -61,14 +61,9 @@ router.delete('/:eventId', oauth.authenticate({scope: "bar"}), (req, res) => {
 
 
 router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
-    user.findOne({where: {id: res.locals.oauth.token.user.id}})
-        .then(barOwner => {
-            if (!barOwner.barId) return res.status(400).send('mek bar');
-            return barOwner;
-        })
-        .then(owner => {
-            return bar.findOne({where: {id: owner.barId}})
-        })
+    let condition: any = {userId: res.locals.oauth.token.user.id};
+    if (req.query.barId) condition.id = req.query.barId;
+    bar.findOne({where: condition})
         .then(foo =>
             foo.createEvent({
                 name: req.body.name,
@@ -77,34 +72,37 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
                 end: req.body.end
             })
                 .then(event => {
-                    res.send(event);
+                    res.status(201).send(event);
                 }))
-        .catch(error => res.status(400).send(error));
+        .catch(error => console.log(error));
 });
 
 router.put('/:eventId', oauth.authenticate({scope: "bar"}), function (req, res) {
     if (!req.params.eventId) return res.status(400).send('supply event id');
+    let condition: any = {userId: res.locals.oauth.token.user.id};
+    if (req.query.barId) condition.id = req.query.barId;
 
-    user.findOne({where: {id: res.locals.oauth.token.user.id}})
-        .then(barOwner => {
-            if (!barOwner.barId) return res.status(400).send('mek bar');
-            return barOwner;
-        })
-        .then(owner => {
-            let condition = {where: {id: req.params.eventId}};
-            if (!owner.isadmin) condition.barId = {[Op.not]: owner.barId};
-            event.findOne(condition)
-                .then(evt => {
-                    console.log(evt);
-                    if (evt && !owner.isadmin) return res.status(401).send('not yer damn bar');
-                    let values = req.body;
-                    values.id = req.params.eventId;
-                    event.upsert(
-                        values
-                    ).then(result => res.send(result))
-                })
-        })
-        .catch(error => res.status(400).send(error));
+    bar.findOne({where: condition}).then(bar => {
+        user.findOne({where: {id: res.locals.oauth.token.user.id}})
+            .then(barOwner => {
+                return barOwner
+            })
+            .then(owner => {
+                let condition = {where: {id: req.params.eventId}};
+                if (!owner.isadmin) condition.barId = {[Op.not]: bar.id};
+                event.findOne(condition)
+                    .then(evt => {
+                        console.log(evt);
+                        if (evt && !owner.isadmin) return res.status(401).send('not yer damn bar');
+                        let values = req.body;
+                        values.id = req.params.eventId;
+                        event.upsert(
+                            values
+                        ).then(result => res.send(result))
+                    })
+            })
+            .catch(error => res.status(400).send(error));
+    });
 });
 
 module.exports = router;

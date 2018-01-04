@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Client = require('../models/client').Client;
+const Client = require('../db/models').Client;
 
-const Logger = require('../models/logger');
+const Logger = require('../db/models').Logger;
 
 /* GET clients. */
 router.get('/', function(req, res, next) {
