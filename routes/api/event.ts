@@ -40,19 +40,17 @@ router.get('/:eventId', (req, res) => {
 });
 
 router.delete('/:eventId', oauth.authenticate({scope: "bar"}), (req, res) => {
-    if (!req.params.eventId) return res.sendStatus(400);
-    user.findOne({where: {id: res.locals.oauth.token.user.id}})
-        .then(barOwner => {
-            if (!barOwner.barId) return res.status(400).send('mek bar');
-            if (barOwner.isadmin) {
-                return event.destroy({where: {id: req.params.eventId}})
-                    .then(deleted => res.send({deleted}));
-            }
-            return event.findOne({where: {barId: barOwner.barId, id: req.params.eventId}})
+    if (!req.params.eventId) return res.status(400).send('supply event id');
+
+
+    event.findOne({where: {id: req.params.eventId}})
                 .then(foundEvent => {
-                    if (!foundEvent) return res.status(400).send('invalid event for this bar');
-                    foundEvent.destroy().then(destroyed => res.send(destroyed));
-                })
+                    if (!foundEvent) return Promise.reject('Event not found');
+                    return bar.findOne({where: {id: foundEvent.barId, userId: res.locals.oauth.token.user.id}})
+                        .then(foundBar => {
+                            if (!foundBar) return Promise.reject('Permission denied');
+                            foundEvent.destroy().then(destroyed => res.send(destroyed));
+                        })
         }).catch(err => {
         Logger.log('error', err);
         res.status(400).send(err);

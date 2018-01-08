@@ -62,7 +62,7 @@ describe('Events', function () {
                                                 chai.request(app)
                                                     .get('/api/events/' + id)
                                                     .end((err, res) => {
-                                                        assert.equal(res.body.name, false);
+                                                        assert.equal(res.body.name, undefined);
                                                         done();
                                                     });
                                             });
