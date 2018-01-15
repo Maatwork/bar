@@ -14,10 +14,10 @@ const oauth = new OAuth2Server({
 router.get('/', (req, res) => {
     let condition = {};
     if (req.query.city) condition.city = req.query.city;
-	if (req.query.userId) condition.userId = req.query.userId;
-		bar.findAll({where: condition, raw: true}).then(bars => {
-		res.send(bars);
-   })
+    if (req.query.userId) condition.userId = req.query.userId;
+    bar.findAll({where: condition, raw: true}).then(bars => {
+        res.send(bars);
+    })
 });
 
 router.get('/:barId', (req, res) => {
@@ -32,8 +32,9 @@ router.get('/:city', (req, res) => {
     if (!req.params.city) return res.sendStatus(400);
 
     bar.findAll({where: {city: req.params.city}})
-        .then(bars => {res.send(bars);
-    })
+        .then(bars => {
+            res.send(bars);
+        })
 });
 
 /* POST bar. */
@@ -49,10 +50,18 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         res.send(errorMessage);
     } else {
 
-            bar.create({ name: req.body.name, description: req.body.description, city: req.body.city, zipcode: req.body.zipcode, address: req.body.address, photos: JSON.parse(req.body.photos), userId: res.locals.oauth.token.user.id })
-                .then(res.redirect('bar'))
-                .catch(error => res.send(error))
-        }
+        bar.create({
+            name: req.body.name,
+            description: req.body.description,
+            city: req.body.city,
+            zipcode: req.body.zipcode,
+            address: req.body.address,
+            photos: JSON.parse(req.body.photos),
+            userId: res.locals.oauth.token.user.id
+        })
+            .then(res.redirect('bar'))
+            .catch(error => res.send(error))
+    }
 });
 
 /* PATCH bar. */
