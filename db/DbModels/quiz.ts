@@ -18,5 +18,4 @@ module.exports.Quiz = db.define('quiz', {
     image: {
         type: types.TEXT, allowNull: true
     }
-
-}
+});

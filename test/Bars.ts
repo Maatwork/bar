@@ -54,6 +54,7 @@ describe('Bars', function () {
                                     .send({name: 'OtherTest'})
                                     .end((err, res) => {
                                         chai.expect(res).to.have.status(200);
+                                        done();
                                     })
                             });
                     })

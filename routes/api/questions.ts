@@ -23,8 +23,6 @@ router.get('/:questionId', function(req, res, next) {
 router.post('/:quizId', formidable(), (req, res, next) => {
     if (req.files["file"]) {
         storage.insert('image', req.files["file"].path, function (err, id, stat) {
-            console.log(id);
-            console.log('test');
             question.create({
                 text: req.fields.text,
                 media: id.toString(),
@@ -47,7 +45,7 @@ router.post('/:quizId', formidable(), (req, res, next) => {
     }).then((question) => {
         res.status(201).send(question);
     }).catch((error) => {
-        console.log(error)
+        console.log(error);
         res.status(400).send(error);
     })
 });
@@ -61,9 +59,10 @@ router.put('/:questionId', formidable(), (req, res, next) => {
                     category: req.fields.category.split(','),
                     answer: req.fields.answer,
                     duration: req.fields.duration
-                }).catch((error) => {
+                }).then(resultQuestion => res.send(resultQuestion))
+                    .catch((error) => {
                     console.log(error);
-                    res.status(201).send(error);
+                        res.status(400).send(error);
                 })
             }
         })

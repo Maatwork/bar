@@ -15,7 +15,8 @@ const Logger = require('./db/models').Logger;
 
 
 require('./db/models').estabilishFKs();
-require('./db/database').getDb.sync();
+require('./db/database').getDb.sync({alter: true});
+
 const app = module.exports = express();
 
 app.oauth = new OAuthServer ({

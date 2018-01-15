@@ -39,6 +39,7 @@ router.get('/:city', (req, res) => {
 
 /* POST bar. */
 router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
+    //dit is een boolean
     let errorMessage: String = '';
     if (!req.body.name) errorMessage += 'Please fill in your bar name';
     if (!req.body.description) errorMessage ? errorMessage += ', bar description' : errorMessage = 'Please fill in your bar description';
@@ -47,20 +48,19 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
     if (!req.body.address) errorMessage ? errorMessage += ' and address ' : errorMessage = 'Please fill in your address';
     if (errorMessage) {
         errorMessage += '.';
-        res.send(errorMessage);
+        res.status(400).send(errorMessage);
     } else {
-
+        console.log(res.locals.oauth.token.user.id);
         bar.create({
             name: req.body.name,
             description: req.body.description,
             city: req.body.city,
             zipcode: req.body.zipcode,
             address: req.body.address,
-            photos: JSON.parse(req.body.photos),
             userId: res.locals.oauth.token.user.id
         })
-            .then(res.redirect('bar'))
-            .catch(error => res.send(error))
+            .then(newBar => res.status(201).send(newBar))
+            .catch(error => console.log(error));
     }
 });
 
