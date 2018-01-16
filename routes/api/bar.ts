@@ -50,13 +50,13 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
         errorMessage += '.';
         res.status(400).send(errorMessage);
     } else {
-        console.log(res.locals.oauth.token.user.id);
         bar.create({
             name: req.body.name,
             description: req.body.description,
             city: req.body.city,
             zipcode: req.body.zipcode,
             address: req.body.address,
+            photos: JSON.parse(req.body.photos),
             userId: res.locals.oauth.token.user.id
         })
             .then(newBar => res.status(201).send(newBar))
@@ -75,7 +75,7 @@ router.patch('/:barId', oauth.authenticate({scope: "bar"}), function (req, res) 
         })
         .then(myBar => {
             delete(req.body.userId);
-            req.body.photos = JSON.parse(req.body.photos);
+            if (req.body.photos) req.body.photos = JSON.parse(req.body.photos);
             return myBar.update(req.body);
         })
         .then(resultBar => (res.send(resultBar)))

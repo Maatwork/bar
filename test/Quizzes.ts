@@ -17,12 +17,14 @@ describe('Quizzes', function () {
                     chai.expect(res).to.have.status(200);
                     chai.expect(res).to.be.json;
                     assert.equal(res.body.length > 1, true);
+                    done();
                 });
         });
     });
     describe('/POST, /PUT a Quiz ', () => {
         describe('/POST new Quiz', () => {
             it('Should be able to post a new Quiz and get back the same name with a 201 status code, in a json string.', (done) => {
+
                 this.timeout(20000);
                 chai.request(app)
                     .post('/api/quizzes')
@@ -37,6 +39,7 @@ describe('Quizzes', function () {
                         chai.expect(res).to.be.json;
                         assert.equal(res.body.name, 'Quizzy');
                         const id = res.body.id;
+                        done();
                         chai.request(app)
                             .put('/api/quizzes/' + id)
                             .set('authorization', 'Bearer bdb3f32507e2716b85fa845ea526b1915cc8dc2c')

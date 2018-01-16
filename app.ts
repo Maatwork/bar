@@ -15,7 +15,7 @@ const Logger = require('./db/models').Logger;
 
 
 require('./db/models').estabilishFKs();
-require('./db/database').getDb.sync({alter: true});
+require('./db/database').getDb.sync();
 
 const app = module.exports = express();
 
