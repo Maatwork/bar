@@ -6,7 +6,6 @@ const Logger = require('../../db/models').Question;
 
 /* GET quizzes. */
 router.get('/', (req, res, next) => {
-    require('../../db/foreignkeys').estabilishFKs();
     quiz.findAll()
         .then(quizzes => res.send(quizzes))
         .catch(error => Logger.log('error', error))
