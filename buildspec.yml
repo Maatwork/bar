@@ -30,3 +30,4 @@ artifacts:
     - views/**/*
     - app.js
     - db/**/*
+    - config/**/*
