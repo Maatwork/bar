@@ -21,23 +21,10 @@ router.get('/:questionId', function(req, res, next) {
 
 /* POST question to quiz */
 router.post('/:quizId', formidable(), (req, res, next) => {
-    if (req.files["file"]) {
-        storage.insert('image', req.files["file"].path, function (err, id, stat) {
-            question.create({
-                text: req.fields.text,
-                media: id.toString(),
-                category: req.fields.category.split(','),
-                answer: req.fields.answer,
-                duration: req.fields.answer,
-                quizId: req.fields.quizId
-            }).then((quiz) => {
-                        res.status(201).send(quiz);
-            }).catch(error => Logger.log(error));
-        })
-    }
-
+    console.log(req.fields)
     question.create({
         text: req.fields.text,
+        media: req.fields.media,
         category: req.fields.category.split(','),
         answer: req.fields.answer,
         duration: req.fields.duration,
