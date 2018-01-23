@@ -60,7 +60,7 @@ router.delete('/:eventId', oauth.authenticate({scope: "bar"}), (req, res) => {
 
 router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
     let condition: any = {userId: res.locals.oauth.token.user.id};
-    if (req.query.barId) condition.id = req.query.barId;
+    if (req.body.barId) condition.id = req.body.barId;
     bar.findOne({where: condition})
         .then(foo =>
             foo.createEvent({
@@ -78,7 +78,7 @@ router.post('/', oauth.authenticate({scope:"bar"}), function(req, res) {
 router.put('/:eventId', oauth.authenticate({scope: "bar"}), function (req, res) {
     if (!req.params.eventId) return res.status(400).send('supply event id');
     let condition: any = {userId: res.locals.oauth.token.user.id};
-    if (req.query.barId) condition.id = req.query.barId;
+    if (req.body.barId) condition.id = req.body.barId;
 
     bar.findOne({where: condition}).then(bar => {
         user.findOne({where: {id: res.locals.oauth.token.user.id}})
